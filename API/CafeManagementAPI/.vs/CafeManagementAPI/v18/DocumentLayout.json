@@ -1,0 +1,309 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|d:\\cafemanagementsystem\\api\\cafemanagementapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|d:\\cafemanagementsystem\\api\\cafemanagementapi\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|solutionrelative:services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|d:\\cafemanagementsystem\\api\\cafemanagementapi\\models\\reservation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|solutionrelative:models\\reservation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|d:\\cafemanagementsystem\\api\\cafemanagementapi\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|solutionrelative:data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|d:\\cafemanagementsystem\\api\\cafemanagementapi\\migrations\\20260221085601_initialcreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|solutionrelative:migrations\\20260221085601_initialcreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221085403_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20260221085403_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|d:\\cafemanagementsystem\\api\\cafemanagementapi\\models\\table.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|solutionrelative:models\\table.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221083956_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20260221083956_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221082910_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20260221082910_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|d:\\cafemanagementsystem\\api\\cafemanagementapi\\data\\designtimedbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|solutionrelative:data\\designtimedbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|d:\\cafemanagementsystem\\api\\cafemanagementapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221063855_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20260221063855_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221070507_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20260221070507_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|d:\\cafemanagementsystem\\api\\cafemanagementapi\\cafemanagementapi.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}",
+      "RelativeMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|solutionrelative:cafemanagementapi.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|d:\\cafemanagementsystem\\api\\cafemanagementapi\\models\\employee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|solutionrelative:models\\employee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|d:\\cafemanagementsystem\\api\\cafemanagementapi\\cafemanagementapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|solutionrelative:cafemanagementapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|d:\\cafemanagementsystem\\api\\cafemanagementapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|solutionrelative:properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|d:\\cafemanagementsystem\\api\\cafemanagementapi\\controllers\\waitercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{03BD3162-14B5-8750-9420-E4E015B19E6B}|CafeManagementAPI.csproj|solutionrelative:controllers\\waitercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:786483161:0:{83107a3e-496a-485e-b455-16ddb978e55e}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "Services\\AuthService.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Services\\AuthService.cs",
+              "RelativeToolTip": "Services\\AuthService.cs",
+              "ViewState": "AgIAAFwAAAAAAAAAAAAcwGsAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-05T20:27:16.093Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Reservation.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Models\\Reservation.cs",
+              "RelativeDocumentMoniker": "Models\\Reservation.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Models\\Reservation.cs",
+              "RelativeToolTip": "Models\\Reservation.cs",
+              "ViewState": "AgIAACsAAAAAAAAAAAA4wCIAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-21T08:56:35.533Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "Data\\ApplicationDbContext.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAPYAAAAAAAAAAAAwwPsAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-14T11:22:43.846Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "20260221085601_InitialCreate.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221085601_InitialCreate.cs",
+              "RelativeDocumentMoniker": "Migrations\\20260221085601_InitialCreate.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221085601_InitialCreate.cs",
+              "RelativeToolTip": "Migrations\\20260221085601_InitialCreate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-21T08:56:01.35Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "20260221085403_InitialCreate.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221085403_InitialCreate.cs",
+              "RelativeDocumentMoniker": "Migrations\\20260221085403_InitialCreate.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221085403_InitialCreate.cs",
+              "RelativeToolTip": "Migrations\\20260221085403_InitialCreate.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-21T08:54:03.978Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAHMAAAAAAAAAAAASwH8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-14T11:26:57.633Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Table.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Models\\Table.cs",
+              "RelativeDocumentMoniker": "Models\\Table.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Models\\Table.cs",
+              "RelativeToolTip": "Models\\Table.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAuwAwAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-21T08:44:20.686Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "20260221083956_InitialCreate.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221083956_InitialCreate.cs",
+              "RelativeDocumentMoniker": "Migrations\\20260221083956_InitialCreate.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221083956_InitialCreate.cs",
+              "RelativeToolTip": "Migrations\\20260221083956_InitialCreate.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-21T08:39:56.401Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "20260221082910_InitialCreate.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221082910_InitialCreate.cs",
+              "RelativeDocumentMoniker": "Migrations\\20260221082910_InitialCreate.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221082910_InitialCreate.cs",
+              "RelativeToolTip": "Migrations\\20260221082910_InitialCreate.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-21T08:29:10.372Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "DesignTimeDbContextFactory.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Data\\DesignTimeDbContextFactory.cs",
+              "RelativeDocumentMoniker": "Data\\DesignTimeDbContextFactory.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Data\\DesignTimeDbContextFactory.cs",
+              "RelativeToolTip": "Data\\DesignTimeDbContextFactory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-21T08:15:26.434Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-02-21T06:05:29.547Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "20260221063855_InitialCreate.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221063855_InitialCreate.cs",
+              "RelativeDocumentMoniker": "Migrations\\20260221063855_InitialCreate.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221063855_InitialCreate.cs",
+              "RelativeToolTip": "Migrations\\20260221063855_InitialCreate.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-21T06:38:56.045Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "20260221070507_InitialCreate.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221070507_InitialCreate.cs",
+              "RelativeDocumentMoniker": "Migrations\\20260221070507_InitialCreate.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Migrations\\20260221070507_InitialCreate.cs",
+              "RelativeToolTip": "Migrations\\20260221070507_InitialCreate.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-21T07:05:08.014Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "CafeManagementAPI.http",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\CafeManagementAPI.http",
+              "RelativeDocumentMoniker": "CafeManagementAPI.http",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\CafeManagementAPI.http",
+              "RelativeToolTip": "CafeManagementAPI.http",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
+              "WhenOpened": "2026-02-14T16:46:13.649Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Employee.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Models\\Employee.cs",
+              "RelativeDocumentMoniker": "Models\\Employee.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Models\\Employee.cs",
+              "RelativeToolTip": "Models\\Employee.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-14T14:50:27.785Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "CafeManagementAPI.csproj",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\CafeManagementAPI.csproj",
+              "RelativeDocumentMoniker": "CafeManagementAPI.csproj",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\CafeManagementAPI.csproj",
+              "RelativeToolTip": "CafeManagementAPI.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-02-13T19:07:40.011Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "WaiterController.cs",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Controllers\\WaiterController.cs",
+              "RelativeDocumentMoniker": "Controllers\\WaiterController.cs",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Controllers\\WaiterController.cs",
+              "RelativeToolTip": "Controllers\\WaiterController.cs",
+              "ViewState": "AgIAAJcAAAAAAAAAAAAcwK8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-13T19:06:31.312Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "Properties\\launchSettings.json",
+              "ToolTip": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\Properties\\launchSettings.json",
+              "RelativeToolTip": "Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-02-13T19:28:07.944Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

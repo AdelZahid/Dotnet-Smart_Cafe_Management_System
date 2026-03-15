@@ -144,6 +144,7 @@ export const managerApi = {
     getItems: () => api.get('/manager/items'),
     createItem: (data) => api.post('/manager/items', data),
     updateItem: (id, data) => api.put(`/manager/items/${id}`, data),
+    deleteItem: (id) => api.delete(`/manager/items/${id}`),
 
     getCurrentOrders: () => api.get('/manager/orders/current'),
     getOnlineOrders: () => api.get('/manager/orders/online'),
@@ -154,9 +155,6 @@ export const managerApi = {
 
     getRefundCancelOrders: (startDate, endDate) =>
         api.get(`/manager/orders/refund-cancel?startDate=${startDate}&endDate=${endDate}`),
-
-    processRefund: (id, refundAmount, reason) =>
-        api.post(`/manager/orders/${id}/refund`, { refundAmount, reason }),
 
     getIngredients: () => api.get('/manager/ingredients'),
     createIngredient: (data) => api.post('/manager/ingredients', data),

@@ -11,6 +11,7 @@ namespace CafeManagementAPI.Services
         Task<ItemResponseDto> CreateItemAsync(int cafeId, ItemCreateDto request);
         Task<List<ItemResponseDto>> GetItemsAsync(int cafeId);
         Task<ItemResponseDto?> UpdateItemAsync(int cafeId, int itemId, ItemUpdateDto request);
+        Task<bool> DeleteItemAsync(int cafeId, int itemId);
 
         // Orders
         Task<List<OrderResponseDto>> GetCurrentOrdersAsync(int cafeId);
@@ -42,6 +43,7 @@ namespace CafeManagementAPI.Services
         // Salary
         Task<SalaryPaymentResponseDto> ProcessSalaryPaymentAsync(int cafeId, SalaryPaymentCreateDto request);
         Task<List<SalaryPaymentResponseDto>> GetSalaryPaymentsAsync(int cafeId, int month, int year);
+
     }
 
     public class ManagerService : IManagerService
@@ -163,11 +165,14 @@ namespace CafeManagementAPI.Services
                 .AsQueryable();
 
             if (startDate.HasValue)
-                query = query.Where(o => o.OrderDate >= startDate.Value);
-            if (endDate.HasValue)
-                query = query.Where(o => o.OrderDate <= endDate.Value);
+                query = query.Where(o => o.Payments.Any(p => p.PaymentDate >= startDate.Value));
 
-            var orders = await query.OrderByDescending(o => o.OrderDate).ToListAsync();
+            if (endDate.HasValue)
+                query = query.Where(o => o.Payments.Any(p => p.PaymentDate <= endDate.Value));
+
+            var orders = await query
+                .OrderByDescending(o => o.Payments.Max(p => p.PaymentDate))
+                .ToListAsync();
 
             return orders.Select(o => new PurchasedOrderDto
             {
@@ -539,7 +544,8 @@ namespace CafeManagementAPI.Services
         }
         #endregion
 
-        #region Helper Methods
+
+
         private async Task<ItemResponseDto> MapToItemResponseDtoAsync(MenuItem item)
         {
             var category = item.Category ?? await _context.ItemCategories.FindAsync(item.CategoryId);
@@ -626,6 +632,21 @@ namespace CafeManagementAPI.Services
                 CreatedAt = reservation.CreatedAt
             };
         }
-        #endregion
+        
+
+        public async Task<bool> DeleteItemAsync(int cafeId, int itemId)
+        {
+            var item = await _context.MenuItems
+                .FirstOrDefaultAsync(mi => mi.CafeId == cafeId && mi.Id == itemId);
+
+            if (item == null) return false;
+
+            _context.MenuItems.Remove(item);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+       
+
+
     }
 }

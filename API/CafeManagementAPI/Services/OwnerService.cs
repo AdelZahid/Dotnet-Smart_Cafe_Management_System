@@ -33,8 +33,11 @@ namespace CafeManagementAPI.Services
             var startDate = request.StartDate ?? DateTime.UtcNow.AddDays(-30);
             var endDate = request.EndDate ?? DateTime.UtcNow;
 
+
             var totalSales = await _context.Orders
-                .Where(o => o.CafeId == cafeId && o.OrderDate >= startDate && o.OrderDate <= endDate && (o.Status == "Served" || o.Status == "Paid"))
+                .Include(o => o.Payments)
+                .Where(o => o.CafeId == cafeId && o.IsPaid)
+                .Where(o => o.Payments.Any(p => p.PaymentDate >= startDate && p.PaymentDate <= endDate))
                 .SumAsync(o => o.TotalAmount);
 
             var totalCostOfProduction = await _context.IngredientUsages
@@ -87,8 +90,9 @@ namespace CafeManagementAPI.Services
                 if (currentWeekEnd > endDate) currentWeekEnd = endDate;
 
                 var weekIncome = await _context.Orders
-                    .Where(o => o.CafeId == cafeId && o.OrderDate >= currentWeekStart && o.OrderDate < currentWeekEnd)
-                    .Where(o => o.Status == "Served" || o.Status == "Paid")
+                    .Include(o => o.Payments)
+                    .Where(o => o.CafeId == cafeId && o.IsPaid)
+                    .Where(o => o.Payments.Any(p => p.PaymentDate >= currentWeekStart && p.PaymentDate < currentWeekEnd))
                     .SumAsync(o => o.TotalAmount);
 
                 weeklyData.Add(new WeeklyIncomeDto
@@ -303,8 +307,9 @@ namespace CafeManagementAPI.Services
             var endDate = request.EndDate ?? DateTime.UtcNow;
 
             var orders = await _context.Orders
-                .Where(o => o.CafeId == cafeId && o.OrderDate >= startDate && o.OrderDate <= endDate)
-                .Where(o => o.Status != "Cancelled")
+                .Include(o => o.Payments)
+                .Where(o => o.CafeId == cafeId && o.IsPaid)
+                .Where(o => o.Payments.Any(p => p.PaymentDate >= startDate && p.PaymentDate <= endDate))
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.MenuItem)
                 .ToListAsync();
@@ -358,8 +363,9 @@ namespace CafeManagementAPI.Services
                 if (currentWeekEnd > endDate) currentWeekEnd = endDate;
 
                 var weekSales = await _context.Orders
-                    .Where(o => o.CafeId == cafeId && o.OrderDate >= currentWeekStart && o.OrderDate < currentWeekEnd)
-                    .Where(o => o.Status != "Cancelled")
+                    .Include(o => o.Payments)
+                    .Where(o => o.CafeId == cafeId && o.IsPaid)
+                    .Where(o => o.Payments.Any(p => p.PaymentDate >= currentWeekStart && p.PaymentDate < currentWeekEnd))
                     .SumAsync(o => o.TotalAmount);
 
                 weeklyData.Add(new WeeklySalesDto

@@ -361,6 +361,26 @@ namespace CafeManagementAPI.Controllers
             }
         }
         #endregion
+
+        #region DeleteItems
+        [HttpDelete("items/{id}")]
+        public async Task<IActionResult> DeleteItem(int id)
+        {
+            try
+            {
+                var cafeId = GetCafeId();
+                var result = await _managerService.DeleteItemAsync(cafeId, id);
+                if (!result)
+                    return NotFound(new { message = "Item not found" });
+
+                return Ok(new { message = "Item deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        #endregion
     }
 
     public class UpdateOrderStatusRequestDto

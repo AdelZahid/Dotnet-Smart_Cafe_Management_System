@@ -117,14 +117,7 @@ namespace CafeManagementAPI.Dtos.Owner
     }
 
     // Cost of Production DTOs
-    public class CostOfProductionReportDto
-    {
-        public decimal TotalCost { get; set; }
-        public List<IngredientCostDto> IngredientCosts { get; set; } = new();
-        public MostCostlyIngredientDto? MostCostlyIngredient { get; set; }
-        public MostUsedIngredientDto? MostUsedIngredient { get; set; }
-        public List<WeeklyCostDto> WeeklyCostData { get; set; } = new();
-    }
+
 
     public class IngredientCostDto
     {
@@ -134,6 +127,19 @@ namespace CafeManagementAPI.Dtos.Owner
         public decimal UnitPrice { get; set; }
         public decimal QuantityUsed { get; set; }
         public decimal TotalCost { get; set; }
+    }
+
+    public class IngredientPurchaseEntryDto
+    {
+        public int IngredientId { get; set; }
+        public string IngredientName { get; set; } = string.Empty;
+        public string UnitOfMeasure { get; set; } = string.Empty;
+        public DateTime PurchaseDate { get; set; }
+        public decimal QuantityPurchased { get; set; }
+        public decimal UnitPrice { get; set; }
+        public decimal TotalPurchaseCost { get; set; }
+        public string? SupplierName { get; set; }
+        public string? Notes { get; set; }
     }
 
     public class MostCostlyIngredientDto
@@ -156,6 +162,17 @@ namespace CafeManagementAPI.Dtos.Owner
         public string WeekLabel { get; set; } = string.Empty;
         public decimal CostAmount { get; set; }
     }
+
+    public class CostOfProductionReportDto
+    {
+        public decimal TotalCost { get; set; }
+        public List<IngredientCostDto> IngredientCosts { get; set; } = new();
+        public List<IngredientPurchaseEntryDto> PurchaseEntries { get; set; } = new();
+        public MostCostlyIngredientDto? MostCostlyIngredient { get; set; }
+        public MostUsedIngredientDto? MostUsedIngredient { get; set; }
+        public List<WeeklyCostDto> WeeklyCostData { get; set; } = new();
+    }
+
 
     // Items DTOs
     public class ItemsByPriceRangeDto

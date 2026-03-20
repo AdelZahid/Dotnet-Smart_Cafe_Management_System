@@ -123,8 +123,8 @@ namespace CafeManagementAPI.Dtos.Manager
 
     public class DailyIngredientEntryDto
     {
-        public List<IngredientPurchaseDto> Purchases { get; set; } = new();
-        public List<IngredientUsageDto> Usages { get; set; } = new();
+        public List<IngredientPurchaseDto> Purchases { get; set; } = new List<IngredientPurchaseDto>();
+        public List<IngredientUsageDto> Usages { get; set; } = new List<IngredientUsageDto>();
     }
 
     // Additional Cost DTOs

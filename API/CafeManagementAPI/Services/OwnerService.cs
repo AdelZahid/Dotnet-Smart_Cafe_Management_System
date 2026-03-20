@@ -40,13 +40,18 @@ namespace CafeManagementAPI.Services
                 .Where(o => o.Payments.Any(p => p.PaymentDate >= startDate && p.PaymentDate <= endDate))
                 .SumAsync(o => o.TotalAmount);
 
-            var totalCostOfProduction = await _context.IngredientUsages
-                .Where(iu => iu.Ingredient.CafeId == cafeId && iu.UsageDate >= startDate && iu.UsageDate <= endDate)
-                .Join(_context.IngredientPurchases,
-                    iu => iu.IngredientId,
-                    ip => ip.IngredientId,
-                    (iu, ip) => new { iu, ip })
-                .SumAsync(x => x.iu.QuantityUsed * x.ip.UnitPrice);
+            var usageRows = await _context.IngredientUsages
+                .Where(iu => iu.Ingredient.CafeId == cafeId &&
+                       iu.UsageDate >= startDate &&
+                       iu.UsageDate <= endDate)
+                .ToListAsync();
+
+            decimal totalCostOfProduction = 0;
+            foreach (var usage in usageRows)
+            {
+                var avgUnitPrice = await GetAverageUnitPriceForRangeAsync(usage.IngredientId, endDate);
+                totalCostOfProduction += usage.QuantityUsed * avgUnitPrice;
+            }
 
             var totalBills = await _context.AdditionalCosts
                 .Where(ac => ac.CafeId == cafeId && ac.CostDate >= startDate && ac.CostDate <= endDate)
@@ -62,7 +67,7 @@ namespace CafeManagementAPI.Services
                 .SumAsync(ac => ac.Amount);
 
             var totalIncome = totalSales;
-            var totalProfitOrLoss = totalIncome - totalCostOfProduction - totalBills - totalEmployeeSalary - irregularCosts;
+            var totalProfitOrLoss = totalIncome - totalCostOfProduction - totalBills - totalEmployeeSalary;
             var weeklyIncomeData = await GetWeeklyIncomeDataAsync(cafeId, startDate, endDate);
 
             return new DashboardSummaryDto
@@ -301,6 +306,35 @@ namespace CafeManagementAPI.Services
             };
         }
 
+
+        private async Task<decimal> GetAverageUnitPriceAsync(int cafeId, int ingredientId, DateTime endDate)
+        {
+            var purchases = await _context.IngredientPurchases
+                .Where(ip => ip.IngredientId == ingredientId)
+                .Where(ip => ip.Ingredient.Purchases.Any())
+                .Where(ip => ip.PurchaseDate <= endDate)
+                .ToListAsync();
+
+            var totalQty = purchases.Sum(p => p.Quantity);
+            if (totalQty <= 0) return 0;
+
+            var totalCost = purchases.Sum(p => p.Quantity * p.UnitPrice);
+            return totalCost / totalQty;
+        }
+
+        private async Task<decimal> GetAverageUnitPriceForRangeAsync(int ingredientId, DateTime endDate)
+        {
+            var purchases = await _context.IngredientPurchases
+                .Where(ip => ip.IngredientId == ingredientId && ip.PurchaseDate <= endDate)
+                .ToListAsync();
+
+            var totalQty = purchases.Sum(p => p.Quantity);
+            if (totalQty <= 0) return 0;
+
+            var totalCost = purchases.Sum(p => p.Quantity * p.UnitPrice);
+            return totalCost / totalQty;
+        }
+
         public async Task<SalesReportDto> GetSalesReportAsync(int cafeId, DateRangeRequestDto request)
         {
             var startDate = request.StartDate ?? DateTime.UtcNow.AddDays(-7);
@@ -381,15 +415,42 @@ namespace CafeManagementAPI.Services
             return weeklyData;
         }
 
+
+
         public async Task<CostOfProductionReportDto> GetCostOfProductionReportAsync(int cafeId, DateRangeRequestDto request)
         {
-            var startDate = request.StartDate ?? DateTime.UtcNow.AddDays(-7);
-            var endDate = request.EndDate ?? DateTime.UtcNow;
+            var startDate = request.StartDate ?? DateTime.UtcNow.Date.AddDays(-6);
+            var endDate = request.EndDate ?? DateTime.UtcNow.Date;
 
+            // usage data for production cost
             var ingredientUsages = await _context.IngredientUsages
-                .Where(iu => iu.Ingredient.CafeId == cafeId && iu.UsageDate >= startDate && iu.UsageDate <= endDate)
+                .Where(iu => iu.Ingredient.CafeId == cafeId &&
+                             iu.UsageDate >= startDate &&
+                             iu.UsageDate <= endDate)
                 .Include(iu => iu.Ingredient)
                 .ToListAsync();
+
+            // purchase entries for selected interval
+            var purchaseEntriesRaw = await _context.IngredientPurchases
+                .Where(ip => ip.Ingredient.CafeId == cafeId &&
+                             ip.PurchaseDate >= startDate &&
+                             ip.PurchaseDate <= endDate)
+                .Include(ip => ip.Ingredient)
+                .OrderByDescending(ip => ip.PurchaseDate)
+                .ToListAsync();
+
+            var purchaseEntries = purchaseEntriesRaw.Select(ip => new IngredientPurchaseEntryDto
+            {
+                IngredientId = ip.IngredientId,
+                IngredientName = ip.Ingredient?.Name ?? "Unknown Ingredient",
+                UnitOfMeasure = ip.Ingredient?.UnitOfMeasure ?? "",
+                PurchaseDate = ip.PurchaseDate,
+                QuantityPurchased = ip.Quantity,
+                UnitPrice = ip.UnitPrice,
+                TotalPurchaseCost = ip.Quantity * ip.UnitPrice,
+                SupplierName = ip.SupplierName,
+                Notes = ip.Notes
+            }).ToList();
 
             var ingredientCosts = new List<IngredientCostDto>();
 
@@ -405,28 +466,43 @@ namespace CafeManagementAPI.Services
                 .OrderByDescending(x => x.TotalQuantity)
                 .FirstOrDefault();
 
-            var mostCostlyIngredient = ingredientUsages
-                .GroupBy(iu => iu.IngredientId)
-                .Select(g => new
-                {
-                    IngredientId = g.Key,
-                    IngredientName = g.First().Ingredient.Name,
-                    TotalCost = g.Sum(iu => iu.QuantityUsed * GetLatestUnitPrice(iu.IngredientId))
-                })
+
+            var costGroups = new List<(int IngredientId, string IngredientName, decimal TotalCost)>();
+
+            foreach (var group in ingredientUsages.GroupBy(iu => iu.IngredientId))
+            {
+                var avgUnitPrice = await GetAverageUnitPriceForRangeAsync(group.Key, endDate);
+                var ingredientTotalCost = group.Sum(x => x.QuantityUsed) * avgUnitPrice;
+
+                costGroups.Add((
+                    group.Key,
+                    group.First().Ingredient.Name,
+                    ingredientTotalCost
+                ));
+            }
+
+            var mostCostlyIngredient = costGroups
                 .OrderByDescending(x => x.TotalCost)
                 .FirstOrDefault();
 
-            foreach (var usage in ingredientUsages)
+            var groupedUsages = ingredientUsages
+                    .GroupBy(iu => iu.IngredientId)
+                    .ToList();
+
+            foreach (var group in groupedUsages)
             {
-                var unitPrice = await GetLatestUnitPriceAsync(usage.IngredientId);
+                var first = group.First();
+                var totalUsed = group.Sum(x => x.QuantityUsed);
+                var avgUnitPrice = await GetAverageUnitPriceForRangeAsync(group.Key, endDate);
+
                 ingredientCosts.Add(new IngredientCostDto
                 {
-                    IngredientId = usage.IngredientId,
-                    IngredientName = usage.Ingredient.Name,
-                    UnitOfMeasure = usage.Ingredient.UnitOfMeasure,
-                    UnitPrice = unitPrice,
-                    QuantityUsed = usage.QuantityUsed,
-                    TotalCost = usage.QuantityUsed * unitPrice
+                    IngredientId = group.Key,
+                    IngredientName = first.Ingredient.Name,
+                    UnitOfMeasure = first.Ingredient.UnitOfMeasure,
+                    UnitPrice = avgUnitPrice,
+                    QuantityUsed = totalUsed,
+                    TotalCost = totalUsed * avgUnitPrice
                 });
             }
 
@@ -437,22 +513,35 @@ namespace CafeManagementAPI.Services
             {
                 TotalCost = totalCost,
                 IngredientCosts = ingredientCosts,
-                MostCostlyIngredient = mostCostlyIngredient != null ? new MostCostlyIngredientDto
-                {
-                    IngredientId = mostCostlyIngredient.IngredientId,
-                    IngredientName = mostCostlyIngredient.IngredientName,
-                    TotalCost = mostCostlyIngredient.TotalCost
-                } : null,
-                MostUsedIngredient = mostUsedIngredient != null ? new MostUsedIngredientDto
-                {
-                    IngredientId = mostUsedIngredient.IngredientId,
-                    IngredientName = mostUsedIngredient.IngredientName,
-                    QuantityUsed = mostUsedIngredient.TotalQuantity,
-                    UnitOfMeasure = mostUsedIngredient.UnitOfMeasure
-                } : null,
+                PurchaseEntries = purchaseEntries,
+
+
+                MostCostlyIngredient = costGroups.Any()
+                    ? new MostCostlyIngredientDto
+                    {
+                        IngredientId = mostCostlyIngredient.IngredientId,
+                        IngredientName = mostCostlyIngredient.IngredientName,
+                        TotalCost = mostCostlyIngredient.TotalCost
+                    }
+                    : null,
+
+
+
+
+                MostUsedIngredient = mostUsedIngredient != null
+                    ? new MostUsedIngredientDto
+                    {
+                        IngredientId = mostUsedIngredient.IngredientId,
+                        IngredientName = mostUsedIngredient.IngredientName,
+                        QuantityUsed = mostUsedIngredient.TotalQuantity,
+                        UnitOfMeasure = mostUsedIngredient.UnitOfMeasure
+                    }
+                    : null,
                 WeeklyCostData = weeklyCostData
             };
         }
+
+
 
         private async Task<decimal> GetLatestUnitPriceAsync(int ingredientId)
         {
@@ -487,15 +576,15 @@ namespace CafeManagementAPI.Services
 
                 var weekCostUsages = await _context.IngredientUsages
                     .Where(iu => iu.Ingredient.CafeId == cafeId &&
-                                 iu.UsageDate >= currentWeekStart &&
-                                 iu.UsageDate < currentWeekEnd)
+                           iu.UsageDate >= currentWeekStart &&
+                           iu.UsageDate < currentWeekEnd)
                     .ToListAsync();
 
                 decimal totalWeekCost = 0;
                 foreach (var usage in weekCostUsages)
                 {
-                    var unitPrice = GetLatestUnitPrice(usage.IngredientId);
-                    totalWeekCost += usage.QuantityUsed * unitPrice;
+                    var avgUnitPrice = await GetAverageUnitPriceForRangeAsync(usage.IngredientId, currentWeekEnd);
+                    totalWeekCost += usage.QuantityUsed * avgUnitPrice;
                 }
 
                 weeklyData.Add(new WeeklyCostDto

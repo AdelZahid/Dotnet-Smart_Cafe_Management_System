@@ -142,6 +142,7 @@ export const ownerApi = {
 
 export const managerApi = {
     getItems: () => api.get('/manager/items'),
+    getWaiters: () => api.get('/manager/waiters'),
     createItem: (data) => api.post('/manager/items', data),
     updateItem: (id, data) => api.put(`/manager/items/${id}`, data),
     deleteItem: (id) => api.delete(`/manager/items/${id}`),

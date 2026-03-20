@@ -221,7 +221,7 @@ namespace CafeManagementAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
             }
         }
         #endregion
@@ -361,6 +361,22 @@ namespace CafeManagementAPI.Controllers
             }
         }
         #endregion
+
+
+        [HttpGet("waiters")]
+        public async Task<IActionResult> GetWaiters()
+        {
+            try
+            {
+                var cafeId = GetCafeId();
+                var waiters = await _managerService.GetWaitersAsync(cafeId);
+                return Ok(waiters);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
         #region DeleteItems
         [HttpDelete("items/{id}")]

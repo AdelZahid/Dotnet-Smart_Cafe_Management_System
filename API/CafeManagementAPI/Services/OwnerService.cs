@@ -262,8 +262,18 @@ namespace CafeManagementAPI.Services
             var lastMonth = currentMonth == 1 ? 12 : currentMonth - 1;
             var lastMonthYear = currentMonth == 1 ? currentYear - 1 : currentYear;
 
-            var lastMonthSalary = await _context.SalaryPayments
+            var salaryToShow = await _context.SalaryPayments
                 .FirstOrDefaultAsync(sp => sp.EmployeeId == employeeId && sp.Month == lastMonth && sp.Year == lastMonthYear);
+
+            if (salaryToShow == null)
+            {
+                salaryToShow = await _context.SalaryPayments
+                    .Where(sp => sp.EmployeeId == employeeId)
+                    .OrderByDescending(sp => sp.Year)
+                    .ThenByDescending(sp => sp.Month)
+                    .ThenByDescending(sp => sp.PaidDate)
+                    .FirstOrDefaultAsync();
+            }
 
             var ordersTaken = 0;
             if (employee.Designation == "Waiter")
@@ -294,13 +304,13 @@ namespace CafeManagementAPI.Services
                     Status = a.Status
                 }).ToList(),
                 AbsentDaysCount = absentDays.Count,
-                LastMonthSalary = lastMonthSalary != null ? new SalaryStatusDto
+                LastMonthSalary = salaryToShow != null ? new SalaryStatusDto
                 {
-                    Month = lastMonthSalary.Month,
-                    Year = lastMonthSalary.Year,
-                    Amount = lastMonthSalary.Amount,
-                    IsPaid = lastMonthSalary.IsPaid,
-                    PaidDate = lastMonthSalary.PaidDate
+                    Month = salaryToShow.Month,
+                    Year = salaryToShow.Year,
+                    Amount = salaryToShow.Amount,
+                    IsPaid = salaryToShow.IsPaid,
+                    PaidDate = salaryToShow.PaidDate
                 } : null,
                 OrdersTakenThisMonth = ordersTaken
             };

@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\CafeManagementAPI.csproj": {}
+    "F:\\Areas\\Development\\Projects\\DotNET\\Dotnet-Smart_Cafe_Management_System\\API\\CafeManagementAPI\\CafeManagementAPI.csproj": {}
   },
   "projects": {
-    "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\CafeManagementAPI.csproj": {
+    "F:\\Areas\\Development\\Projects\\DotNET\\Dotnet-Smart_Cafe_Management_System\\API\\CafeManagementAPI\\CafeManagementAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\CafeManagementAPI.csproj",
+        "projectUniqueName": "F:\\Areas\\Development\\Projects\\DotNET\\Dotnet-Smart_Cafe_Management_System\\API\\CafeManagementAPI\\CafeManagementAPI.csproj",
         "projectName": "CafeManagementAPI",
-        "projectPath": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\CafeManagementAPI.csproj",
-        "packagesPath": "C:\\Users\\adelz\\.nuget\\packages\\",
-        "outputPath": "D:\\CafeManagementSystem\\API\\CafeManagementAPI\\obj\\",
+        "projectPath": "F:\\Areas\\Development\\Projects\\DotNET\\Dotnet-Smart_Cafe_Management_System\\API\\CafeManagementAPI\\CafeManagementAPI.csproj",
+        "packagesPath": "C:\\Users\\rubay\\.nuget\\packages\\",
+        "outputPath": "F:\\Areas\\Development\\Projects\\DotNET\\Dotnet-Smart_Cafe_Management_System\\API\\CafeManagementAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\adelz\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\rubay\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,6 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -100,7 +101,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

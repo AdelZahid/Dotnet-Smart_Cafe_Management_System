@@ -63,46 +63,6 @@ namespace CafeManagementAPI.Data
                 .HasIndex(iu => new { iu.IngredientId, iu.UsageDate })
                 .IsUnique();
 
-            modelBuilder.Entity<Employee>()
-                .Property(e => e.Salary)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<MenuItem>()
-                .Property(m => m.UnitPrice)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Order>()
-                .Property(o => o.TotalAmount)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<OrderItem>()
-                .Property(oi => oi.UnitPrice)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Payment>()
-                .Property(p => p.Amount)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Ingredient>()
-                .Property(i => i.CurrentStock)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Ingredient>()
-                .Property(i => i.MinStockLevel)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<IngredientPurchase>()
-                .Property(ip => ip.Quantity)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<IngredientPurchase>()
-                .Property(ip => ip.UnitPrice)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<IngredientUsage>()
-                .Property(iu => iu.QuantityUsed)
-                .HasColumnType("decimal(18,2)");
-
             modelBuilder.Entity<IngredientUsage>()
                 .Property(iu => iu.QuantityWasted)
                 .HasColumnType("decimal(18,2)");

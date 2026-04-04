@@ -9,10 +9,12 @@ namespace CafeManagementAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, ILogger<AuthController> logger)
         {
             _authService = authService;
+            _logger = logger;
         }
 
         [HttpPost("login")]
@@ -58,21 +60,45 @@ namespace CafeManagementAPI.Controllers
         [HttpPost("register-owner")]
         public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerRequestDto request)
         {
-            var response = await _authService.RegisterOwnerAsync(request);
-            if (!response.Success)
-                return BadRequest(response);
+            try
+            {
+                var response = await _authService.RegisterOwnerAsync(request);
+                if (!response.Success)
+                    return BadRequest(response);
 
-            return Ok(response);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unhandled error in register-owner endpoint");
+                return StatusCode(500, new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Unexpected server error during registration."
+                });
+            }
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterOwnerRequestDto request)
         {
-            var response = await _authService.RegisterOwnerAsync(request);
-            if (!response.Success)
-                return BadRequest(response);
+            try
+            {
+                var response = await _authService.RegisterOwnerAsync(request);
+                if (!response.Success)
+                    return BadRequest(response);
 
-            return Ok(response);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unhandled error in register endpoint");
+                return StatusCode(500, new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Unexpected server error during registration."
+                });
+            }
         }
 
         [HttpPost("register-employee")]

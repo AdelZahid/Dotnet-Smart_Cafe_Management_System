@@ -67,6 +67,39 @@ namespace CafeManagementAPI.Dtos.Owner
         public int OrdersTakenThisMonth { get; set; }
     }
 
+    public class ManagerBasicDto
+    {
+        public int Id { get; set; }
+        public string EmployeeId { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Designation { get; set; } = string.Empty;
+        public string? Shift { get; set; }
+        public decimal Salary { get; set; }
+    }
+
+    public class ManagerSalaryPaymentCreateDto
+    {
+        public int EmployeeId { get; set; }
+        public int Month { get; set; }
+        public int Year { get; set; }
+        public decimal Amount { get; set; }
+        public string PaymentMethod { get; set; } = string.Empty;
+        public string? Notes { get; set; }
+    }
+
+    public class ManagerSalaryPaymentResponseDto
+    {
+        public int Id { get; set; }
+        public string EmployeeName { get; set; } = string.Empty;
+        public string EmployeeId { get; set; } = string.Empty;
+        public int Month { get; set; }
+        public int Year { get; set; }
+        public decimal Amount { get; set; }
+        public bool IsPaid { get; set; }
+        public DateTime? PaidDate { get; set; }
+        public string? PaymentMethod { get; set; }
+    }
+
     public class AttendanceDto
     {
         public DateTime Date { get; set; }

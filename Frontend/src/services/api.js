@@ -118,6 +118,10 @@ export const ownerApi = {
     approveEmployeeRequest: (id, data) => api.post(`/owner/employee-requests/${id}/approve`, data),
     rejectEmployeeRequest: (id) => api.post(`/owner/employee-requests/${id}/reject`),
 
+    getManagers: () => api.get('/owner/managers'),
+    getManagerSalary: (month, year) => api.get(`/owner/manager-salary?month=${month}&year=${year}`),
+    processManagerSalary: (data) => api.post('/owner/manager-salary', data),
+
     getEmployees: () => api.get('/owner/employees'),
 
     getEmployeeDetail: (id) => api.get(`/owner/employees/${id}`),

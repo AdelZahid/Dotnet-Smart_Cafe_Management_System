@@ -108,6 +108,59 @@ namespace CafeManagementAPI.Controllers
 
         #endregion
 
+        #region Manager Salary
+
+        [HttpGet("managers")]
+        public async Task<IActionResult> GetManagers()
+        {
+            try
+            {
+                var cafeId = GetCafeId();
+                var managers = await _ownerService.GetManagersAsync(cafeId);
+                return Ok(managers);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("manager-salary")]
+        public async Task<IActionResult> GetManagerSalaryPayments([FromQuery] int month, [FromQuery] int year)
+        {
+            try
+            {
+                var cafeId = GetCafeId();
+                var payments = await _ownerService.GetManagerSalaryPaymentsAsync(cafeId, month, year);
+                return Ok(payments);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("manager-salary")]
+        public async Task<IActionResult> ProcessManagerSalaryPayment([FromBody] ManagerSalaryPaymentCreateDto request)
+        {
+            try
+            {
+                var cafeId = GetCafeId();
+                var payment = await _ownerService.ProcessManagerSalaryPaymentAsync(cafeId, request);
+                return CreatedAtAction(nameof(GetManagerSalaryPayments), new { id = payment.Id }, payment);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        #endregion
+
         #region Employees
 
         [HttpGet("employees")]

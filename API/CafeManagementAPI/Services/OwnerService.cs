@@ -10,6 +10,9 @@ namespace CafeManagementAPI.Services
         Task<DashboardSummaryDto> GetDashboardSummaryAsync(int cafeId, DateRangeRequestDto request);
         Task<List<EmployeeResponseDto>> GetEmployeesAsync(int cafeId);
         Task<EmployeeDetailDto?> GetEmployeeDetailAsync(int cafeId, int employeeId);
+        Task<List<ManagerBasicDto>> GetManagersAsync(int cafeId);
+        Task<ManagerSalaryPaymentResponseDto> ProcessManagerSalaryPaymentAsync(int cafeId, ManagerSalaryPaymentCreateDto request);
+        Task<List<ManagerSalaryPaymentResponseDto>> GetManagerSalaryPaymentsAsync(int cafeId, int month, int year);
         Task<List<EmployeeRequestResponseDto>> GetPendingEmployeeRequestsAsync(int cafeId);
         Task<EmployeeResponseDto?> ApproveEmployeeRequestAsync(int cafeId, int requestId, ApproveEmployeeRequestDto request);
         Task<bool> RejectEmployeeRequestAsync(int cafeId,int requestId);
@@ -241,6 +244,108 @@ namespace CafeManagementAPI.Services
                 .ToListAsync();
 
             return employees.Select(MapToEmployeeResponseDto).ToList();
+        }
+
+        public async Task<List<ManagerBasicDto>> GetManagersAsync(int cafeId)
+        {
+            var managers = await _context.Employees
+                .Where(e => e.CafeId == cafeId && e.Designation == "Manager" && e.IsActive)
+                .OrderBy(e => e.Name)
+                .ToListAsync();
+
+            return managers.Select(e => new ManagerBasicDto
+            {
+                Id = e.Id,
+                EmployeeId = e.EmployeeId,
+                Name = e.Name,
+                Designation = e.Designation,
+                Shift = e.Shift,
+                Salary = e.Salary
+            }).ToList();
+        }
+
+        public async Task<ManagerSalaryPaymentResponseDto> ProcessManagerSalaryPaymentAsync(int cafeId, ManagerSalaryPaymentCreateDto request)
+        {
+            var manager = await _context.Employees
+                .FirstOrDefaultAsync(e => e.CafeId == cafeId && e.Id == request.EmployeeId && e.Designation == "Manager");
+
+            if (manager == null)
+            {
+                throw new InvalidOperationException("Manager not found");
+            }
+
+            var existingPayment = await _context.SalaryPayments
+                .FirstOrDefaultAsync(sp => sp.EmployeeId == request.EmployeeId && sp.Month == request.Month && sp.Year == request.Year);
+
+            if (existingPayment != null && existingPayment.IsPaid)
+            {
+                throw new InvalidOperationException("Salary already paid for this month");
+            }
+
+            SalaryPayment payment;
+            if (existingPayment != null)
+            {
+                payment = existingPayment;
+                payment.Amount = request.Amount;
+                payment.IsPaid = true;
+                payment.PaidDate = DateTime.UtcNow;
+                payment.PaymentMethod = request.PaymentMethod;
+                payment.Notes = request.Notes;
+            }
+            else
+            {
+                payment = new SalaryPayment
+                {
+                    EmployeeId = request.EmployeeId,
+                    Month = request.Month,
+                    Year = request.Year,
+                    Amount = request.Amount,
+                    IsPaid = true,
+                    PaidDate = DateTime.UtcNow,
+                    PaymentMethod = request.PaymentMethod,
+                    Notes = request.Notes,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.SalaryPayments.Add(payment);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new ManagerSalaryPaymentResponseDto
+            {
+                Id = payment.Id,
+                EmployeeName = manager.Name,
+                EmployeeId = manager.EmployeeId,
+                Month = payment.Month,
+                Year = payment.Year,
+                Amount = payment.Amount,
+                IsPaid = payment.IsPaid,
+                PaidDate = payment.PaidDate,
+                PaymentMethod = payment.PaymentMethod
+            };
+        }
+
+        public async Task<List<ManagerSalaryPaymentResponseDto>> GetManagerSalaryPaymentsAsync(int cafeId, int month, int year)
+        {
+            var payments = await _context.SalaryPayments
+                .Where(sp => sp.Employee.CafeId == cafeId && sp.Employee.Designation == "Manager" && sp.Month == month && sp.Year == year)
+                .Include(sp => sp.Employee)
+                .OrderByDescending(sp => sp.PaidDate)
+                .ToListAsync();
+
+            return payments.Select(sp => new ManagerSalaryPaymentResponseDto
+            {
+                Id = sp.Id,
+                EmployeeName = sp.Employee.Name,
+                EmployeeId = sp.Employee.EmployeeId,
+                Month = sp.Month,
+                Year = sp.Year,
+                Amount = sp.Amount,
+                IsPaid = sp.IsPaid,
+                PaidDate = sp.PaidDate,
+                PaymentMethod = sp.PaymentMethod
+            }).ToList();
         }
 
         public async Task<EmployeeDetailDto?> GetEmployeeDetailAsync(int cafeId, int employeeId)

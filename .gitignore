@@ -1,1 +1,8 @@
 .vs/
+
+# .NET build outputs
+**/bin/
+**/obj/
+**/publish/
+**/TestResults/
+

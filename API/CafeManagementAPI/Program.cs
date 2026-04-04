@@ -118,9 +118,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Apply migrations automatically with error handling before the app starts serving requests.
-using (var scope = app.Services.CreateScope())
+var runMigrationsOnStartup = builder.Configuration.GetValue<bool>("RunMigrationsOnStartup");
+if (runMigrationsOnStartup)
 {
+    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var logger = services.GetRequiredService<ILogger<Program>>();
 

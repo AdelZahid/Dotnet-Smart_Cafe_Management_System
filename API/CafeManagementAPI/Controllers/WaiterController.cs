@@ -53,6 +53,21 @@ namespace CafeManagementAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet("tables")]
+        public async Task<IActionResult> GetTableOverview([FromQuery] DateTime? date)
+        {
+            try
+            {
+                var cafeId = GetCafeId();
+                var tables = await _waiterService.GetTableOverviewAsync(cafeId, date);
+                return Ok(tables);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
         #endregion
 
         #region Orders

@@ -30,9 +30,11 @@ import OwnerEmployees from './pages/owner/OwnerEmployees'
 import OwnerSalesReports from './pages/owner/OwnerSalesReports'
 import OwnerCostReports from './pages/owner/OwnerCostReports'
 import OwnerItems from './pages/owner/OwnerItems'
+import OwnerManagerSalary from './pages/owner/OwnerManagerSalary'
 
 import WaiterLayout from './pages/waiter/WaiterLayout'
 import WaiterMenu from './pages/waiter/WaiterMenu'
+import WaiterTables from './pages/waiter/WaiterTables'
 import WaiterOrders from './pages/waiter/WaiterOrders'
 import WaiterPayment from './pages/waiter/WaiterPayment'
 
@@ -126,6 +128,7 @@ function App() {
                 <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="dashboard" element={<OwnerDashboard />} />
                 <Route path="employees" element={<OwnerEmployees />} />
+                <Route path="manager-salary" element={<OwnerManagerSalary />} />
                 <Route path="sales" element={<OwnerSalesReports />} />
                 <Route path="costs" element={<OwnerCostReports />} />
                 <Route path="items" element={<OwnerItems />} />
@@ -160,6 +163,7 @@ function App() {
             >
                 <Route index element={<Navigate to="menu" replace />} />
                 <Route path="menu" element={<WaiterMenu />} />
+                <Route path="tables" element={<WaiterTables />} />
                 <Route path="orders" element={<WaiterOrders />} />
                 <Route path="payment" element={<WaiterPayment />} />
             </Route>

@@ -1,10 +1,11 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Users, BarChart3, Wallet, Package, LogOut, Coffee } from 'lucide-react'
+import { LayoutDashboard, Users, BarChart3, Wallet, Package, LogOut, Coffee, HandCoins } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 
 const navItems = [
   { label: 'Dashboard', to: '/owner/dashboard', icon: LayoutDashboard },
   { label: 'Employee List', to: '/owner/employees', icon: Users },
+  { label: 'Manager Salary', to: '/owner/manager-salary', icon: HandCoins },
   { label: 'Sales Reports', to: '/owner/sales', icon: BarChart3 },
   { label: 'Cost of Production', to: '/owner/costs', icon: Wallet },
   { label: 'Items', to: '/owner/items', icon: Package },

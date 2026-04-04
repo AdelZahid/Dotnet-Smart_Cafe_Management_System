@@ -1,9 +1,10 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BookOpen, ClipboardList, CreditCard, LogOut } from 'lucide-react'
+import { BookOpen, ClipboardList, CreditCard, LogOut, Table2 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 
 const items = [
     { to: '/waiter/menu', label: 'Menu', icon: BookOpen },
+    { to: '/waiter/tables', label: 'Tables', icon: Table2 },
     { to: '/waiter/orders', label: 'Orders', icon: ClipboardList },
     { to: '/waiter/payment', label: 'Payment', icon: CreditCard },
 ]

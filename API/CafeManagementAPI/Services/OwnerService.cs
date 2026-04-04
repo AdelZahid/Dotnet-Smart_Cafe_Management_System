@@ -10,6 +10,9 @@ namespace CafeManagementAPI.Services
         Task<DashboardSummaryDto> GetDashboardSummaryAsync(int cafeId, DateRangeRequestDto request);
         Task<List<EmployeeResponseDto>> GetEmployeesAsync(int cafeId);
         Task<EmployeeDetailDto?> GetEmployeeDetailAsync(int cafeId, int employeeId);
+        Task<List<ManagerBasicDto>> GetManagersAsync(int cafeId);
+        Task<ManagerSalaryPaymentResponseDto> ProcessManagerSalaryPaymentAsync(int cafeId, ManagerSalaryPaymentCreateDto request);
+        Task<List<ManagerSalaryPaymentResponseDto>> GetManagerSalaryPaymentsAsync(int cafeId, int month, int year);
         Task<List<EmployeeRequestResponseDto>> GetPendingEmployeeRequestsAsync(int cafeId);
         Task<EmployeeResponseDto?> ApproveEmployeeRequestAsync(int cafeId, int requestId, ApproveEmployeeRequestDto request);
         Task<bool> RejectEmployeeRequestAsync(int cafeId,int requestId);
@@ -40,13 +43,18 @@ namespace CafeManagementAPI.Services
                 .Where(o => o.Payments.Any(p => p.PaymentDate >= startDate && p.PaymentDate <= endDate))
                 .SumAsync(o => o.TotalAmount);
 
-            var totalCostOfProduction = await _context.IngredientUsages
-                .Where(iu => iu.Ingredient.CafeId == cafeId && iu.UsageDate >= startDate && iu.UsageDate <= endDate)
-                .Join(_context.IngredientPurchases,
-                    iu => iu.IngredientId,
-                    ip => ip.IngredientId,
-                    (iu, ip) => new { iu, ip })
-                .SumAsync(x => x.iu.QuantityUsed * x.ip.UnitPrice);
+            var usageRows = await _context.IngredientUsages
+                .Where(iu => iu.Ingredient.CafeId == cafeId &&
+                       iu.UsageDate >= startDate &&
+                       iu.UsageDate <= endDate)
+                .ToListAsync();
+
+            decimal totalCostOfProduction = 0;
+            foreach (var usage in usageRows)
+            {
+                var avgUnitPrice = await GetAverageUnitPriceForRangeAsync(usage.IngredientId, endDate);
+                totalCostOfProduction += usage.QuantityUsed * avgUnitPrice;
+            }
 
             var totalBills = await _context.AdditionalCosts
                 .Where(ac => ac.CafeId == cafeId && ac.CostDate >= startDate && ac.CostDate <= endDate)
@@ -62,7 +70,7 @@ namespace CafeManagementAPI.Services
                 .SumAsync(ac => ac.Amount);
 
             var totalIncome = totalSales;
-            var totalProfitOrLoss = totalIncome - totalCostOfProduction - totalBills - totalEmployeeSalary - irregularCosts;
+            var totalProfitOrLoss = totalIncome - totalCostOfProduction - totalBills - totalEmployeeSalary;
             var weeklyIncomeData = await GetWeeklyIncomeDataAsync(cafeId, startDate, endDate);
 
             return new DashboardSummaryDto
@@ -238,6 +246,108 @@ namespace CafeManagementAPI.Services
             return employees.Select(MapToEmployeeResponseDto).ToList();
         }
 
+        public async Task<List<ManagerBasicDto>> GetManagersAsync(int cafeId)
+        {
+            var managers = await _context.Employees
+                .Where(e => e.CafeId == cafeId && e.Designation == "Manager" && e.IsActive)
+                .OrderBy(e => e.Name)
+                .ToListAsync();
+
+            return managers.Select(e => new ManagerBasicDto
+            {
+                Id = e.Id,
+                EmployeeId = e.EmployeeId,
+                Name = e.Name,
+                Designation = e.Designation,
+                Shift = e.Shift,
+                Salary = e.Salary
+            }).ToList();
+        }
+
+        public async Task<ManagerSalaryPaymentResponseDto> ProcessManagerSalaryPaymentAsync(int cafeId, ManagerSalaryPaymentCreateDto request)
+        {
+            var manager = await _context.Employees
+                .FirstOrDefaultAsync(e => e.CafeId == cafeId && e.Id == request.EmployeeId && e.Designation == "Manager");
+
+            if (manager == null)
+            {
+                throw new InvalidOperationException("Manager not found");
+            }
+
+            var existingPayment = await _context.SalaryPayments
+                .FirstOrDefaultAsync(sp => sp.EmployeeId == request.EmployeeId && sp.Month == request.Month && sp.Year == request.Year);
+
+            if (existingPayment != null && existingPayment.IsPaid)
+            {
+                throw new InvalidOperationException("Salary already paid for this month");
+            }
+
+            SalaryPayment payment;
+            if (existingPayment != null)
+            {
+                payment = existingPayment;
+                payment.Amount = request.Amount;
+                payment.IsPaid = true;
+                payment.PaidDate = DateTime.UtcNow;
+                payment.PaymentMethod = request.PaymentMethod;
+                payment.Notes = request.Notes;
+            }
+            else
+            {
+                payment = new SalaryPayment
+                {
+                    EmployeeId = request.EmployeeId,
+                    Month = request.Month,
+                    Year = request.Year,
+                    Amount = request.Amount,
+                    IsPaid = true,
+                    PaidDate = DateTime.UtcNow,
+                    PaymentMethod = request.PaymentMethod,
+                    Notes = request.Notes,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.SalaryPayments.Add(payment);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new ManagerSalaryPaymentResponseDto
+            {
+                Id = payment.Id,
+                EmployeeName = manager.Name,
+                EmployeeId = manager.EmployeeId,
+                Month = payment.Month,
+                Year = payment.Year,
+                Amount = payment.Amount,
+                IsPaid = payment.IsPaid,
+                PaidDate = payment.PaidDate,
+                PaymentMethod = payment.PaymentMethod
+            };
+        }
+
+        public async Task<List<ManagerSalaryPaymentResponseDto>> GetManagerSalaryPaymentsAsync(int cafeId, int month, int year)
+        {
+            var payments = await _context.SalaryPayments
+                .Where(sp => sp.Employee.CafeId == cafeId && sp.Employee.Designation == "Manager" && sp.Month == month && sp.Year == year)
+                .Include(sp => sp.Employee)
+                .OrderByDescending(sp => sp.PaidDate)
+                .ToListAsync();
+
+            return payments.Select(sp => new ManagerSalaryPaymentResponseDto
+            {
+                Id = sp.Id,
+                EmployeeName = sp.Employee.Name,
+                EmployeeId = sp.Employee.EmployeeId,
+                Month = sp.Month,
+                Year = sp.Year,
+                Amount = sp.Amount,
+                IsPaid = sp.IsPaid,
+                PaidDate = sp.PaidDate,
+                PaymentMethod = sp.PaymentMethod
+            }).ToList();
+        }
+
         public async Task<EmployeeDetailDto?> GetEmployeeDetailAsync(int cafeId, int employeeId)
         {
             var employee = await _context.Employees
@@ -257,8 +367,18 @@ namespace CafeManagementAPI.Services
             var lastMonth = currentMonth == 1 ? 12 : currentMonth - 1;
             var lastMonthYear = currentMonth == 1 ? currentYear - 1 : currentYear;
 
-            var lastMonthSalary = await _context.SalaryPayments
+            var salaryToShow = await _context.SalaryPayments
                 .FirstOrDefaultAsync(sp => sp.EmployeeId == employeeId && sp.Month == lastMonth && sp.Year == lastMonthYear);
+
+            if (salaryToShow == null)
+            {
+                salaryToShow = await _context.SalaryPayments
+                    .Where(sp => sp.EmployeeId == employeeId)
+                    .OrderByDescending(sp => sp.Year)
+                    .ThenByDescending(sp => sp.Month)
+                    .ThenByDescending(sp => sp.PaidDate)
+                    .FirstOrDefaultAsync();
+            }
 
             var ordersTaken = 0;
             if (employee.Designation == "Waiter")
@@ -289,16 +409,45 @@ namespace CafeManagementAPI.Services
                     Status = a.Status
                 }).ToList(),
                 AbsentDaysCount = absentDays.Count,
-                LastMonthSalary = lastMonthSalary != null ? new SalaryStatusDto
+                LastMonthSalary = salaryToShow != null ? new SalaryStatusDto
                 {
-                    Month = lastMonthSalary.Month,
-                    Year = lastMonthSalary.Year,
-                    Amount = lastMonthSalary.Amount,
-                    IsPaid = lastMonthSalary.IsPaid,
-                    PaidDate = lastMonthSalary.PaidDate
+                    Month = salaryToShow.Month,
+                    Year = salaryToShow.Year,
+                    Amount = salaryToShow.Amount,
+                    IsPaid = salaryToShow.IsPaid,
+                    PaidDate = salaryToShow.PaidDate
                 } : null,
                 OrdersTakenThisMonth = ordersTaken
             };
+        }
+
+
+        private async Task<decimal> GetAverageUnitPriceAsync(int cafeId, int ingredientId, DateTime endDate)
+        {
+            var purchases = await _context.IngredientPurchases
+                .Where(ip => ip.IngredientId == ingredientId)
+                .Where(ip => ip.Ingredient.Purchases.Any())
+                .Where(ip => ip.PurchaseDate <= endDate)
+                .ToListAsync();
+
+            var totalQty = purchases.Sum(p => p.Quantity);
+            if (totalQty <= 0) return 0;
+
+            var totalCost = purchases.Sum(p => p.Quantity * p.UnitPrice);
+            return totalCost / totalQty;
+        }
+
+        private async Task<decimal> GetAverageUnitPriceForRangeAsync(int ingredientId, DateTime endDate)
+        {
+            var purchases = await _context.IngredientPurchases
+                .Where(ip => ip.IngredientId == ingredientId && ip.PurchaseDate <= endDate)
+                .ToListAsync();
+
+            var totalQty = purchases.Sum(p => p.Quantity);
+            if (totalQty <= 0) return 0;
+
+            var totalCost = purchases.Sum(p => p.Quantity * p.UnitPrice);
+            return totalCost / totalQty;
         }
 
         public async Task<SalesReportDto> GetSalesReportAsync(int cafeId, DateRangeRequestDto request)
@@ -381,15 +530,42 @@ namespace CafeManagementAPI.Services
             return weeklyData;
         }
 
+
+
         public async Task<CostOfProductionReportDto> GetCostOfProductionReportAsync(int cafeId, DateRangeRequestDto request)
         {
-            var startDate = request.StartDate ?? DateTime.UtcNow.AddDays(-7);
-            var endDate = request.EndDate ?? DateTime.UtcNow;
+            var startDate = request.StartDate ?? DateTime.UtcNow.Date.AddDays(-6);
+            var endDate = request.EndDate ?? DateTime.UtcNow.Date;
 
+            // usage data for production cost
             var ingredientUsages = await _context.IngredientUsages
-                .Where(iu => iu.Ingredient.CafeId == cafeId && iu.UsageDate >= startDate && iu.UsageDate <= endDate)
+                .Where(iu => iu.Ingredient.CafeId == cafeId &&
+                             iu.UsageDate >= startDate &&
+                             iu.UsageDate <= endDate)
                 .Include(iu => iu.Ingredient)
                 .ToListAsync();
+
+            // purchase entries for selected interval
+            var purchaseEntriesRaw = await _context.IngredientPurchases
+                .Where(ip => ip.Ingredient.CafeId == cafeId &&
+                             ip.PurchaseDate >= startDate &&
+                             ip.PurchaseDate <= endDate)
+                .Include(ip => ip.Ingredient)
+                .OrderByDescending(ip => ip.PurchaseDate)
+                .ToListAsync();
+
+            var purchaseEntries = purchaseEntriesRaw.Select(ip => new IngredientPurchaseEntryDto
+            {
+                IngredientId = ip.IngredientId,
+                IngredientName = ip.Ingredient?.Name ?? "Unknown Ingredient",
+                UnitOfMeasure = ip.Ingredient?.UnitOfMeasure ?? "",
+                PurchaseDate = ip.PurchaseDate,
+                QuantityPurchased = ip.Quantity,
+                UnitPrice = ip.UnitPrice,
+                TotalPurchaseCost = ip.Quantity * ip.UnitPrice,
+                SupplierName = ip.SupplierName,
+                Notes = ip.Notes
+            }).ToList();
 
             var ingredientCosts = new List<IngredientCostDto>();
 
@@ -405,28 +581,43 @@ namespace CafeManagementAPI.Services
                 .OrderByDescending(x => x.TotalQuantity)
                 .FirstOrDefault();
 
-            var mostCostlyIngredient = ingredientUsages
-                .GroupBy(iu => iu.IngredientId)
-                .Select(g => new
-                {
-                    IngredientId = g.Key,
-                    IngredientName = g.First().Ingredient.Name,
-                    TotalCost = g.Sum(iu => iu.QuantityUsed * GetLatestUnitPrice(iu.IngredientId))
-                })
+
+            var costGroups = new List<(int IngredientId, string IngredientName, decimal TotalCost)>();
+
+            foreach (var group in ingredientUsages.GroupBy(iu => iu.IngredientId))
+            {
+                var avgUnitPrice = await GetAverageUnitPriceForRangeAsync(group.Key, endDate);
+                var ingredientTotalCost = group.Sum(x => x.QuantityUsed) * avgUnitPrice;
+
+                costGroups.Add((
+                    group.Key,
+                    group.First().Ingredient.Name,
+                    ingredientTotalCost
+                ));
+            }
+
+            var mostCostlyIngredient = costGroups
                 .OrderByDescending(x => x.TotalCost)
                 .FirstOrDefault();
 
-            foreach (var usage in ingredientUsages)
+            var groupedUsages = ingredientUsages
+                    .GroupBy(iu => iu.IngredientId)
+                    .ToList();
+
+            foreach (var group in groupedUsages)
             {
-                var unitPrice = await GetLatestUnitPriceAsync(usage.IngredientId);
+                var first = group.First();
+                var totalUsed = group.Sum(x => x.QuantityUsed);
+                var avgUnitPrice = await GetAverageUnitPriceForRangeAsync(group.Key, endDate);
+
                 ingredientCosts.Add(new IngredientCostDto
                 {
-                    IngredientId = usage.IngredientId,
-                    IngredientName = usage.Ingredient.Name,
-                    UnitOfMeasure = usage.Ingredient.UnitOfMeasure,
-                    UnitPrice = unitPrice,
-                    QuantityUsed = usage.QuantityUsed,
-                    TotalCost = usage.QuantityUsed * unitPrice
+                    IngredientId = group.Key,
+                    IngredientName = first.Ingredient.Name,
+                    UnitOfMeasure = first.Ingredient.UnitOfMeasure,
+                    UnitPrice = avgUnitPrice,
+                    QuantityUsed = totalUsed,
+                    TotalCost = totalUsed * avgUnitPrice
                 });
             }
 
@@ -437,22 +628,35 @@ namespace CafeManagementAPI.Services
             {
                 TotalCost = totalCost,
                 IngredientCosts = ingredientCosts,
-                MostCostlyIngredient = mostCostlyIngredient != null ? new MostCostlyIngredientDto
-                {
-                    IngredientId = mostCostlyIngredient.IngredientId,
-                    IngredientName = mostCostlyIngredient.IngredientName,
-                    TotalCost = mostCostlyIngredient.TotalCost
-                } : null,
-                MostUsedIngredient = mostUsedIngredient != null ? new MostUsedIngredientDto
-                {
-                    IngredientId = mostUsedIngredient.IngredientId,
-                    IngredientName = mostUsedIngredient.IngredientName,
-                    QuantityUsed = mostUsedIngredient.TotalQuantity,
-                    UnitOfMeasure = mostUsedIngredient.UnitOfMeasure
-                } : null,
+                PurchaseEntries = purchaseEntries,
+
+
+                MostCostlyIngredient = costGroups.Any()
+                    ? new MostCostlyIngredientDto
+                    {
+                        IngredientId = mostCostlyIngredient.IngredientId,
+                        IngredientName = mostCostlyIngredient.IngredientName,
+                        TotalCost = mostCostlyIngredient.TotalCost
+                    }
+                    : null,
+
+
+
+
+                MostUsedIngredient = mostUsedIngredient != null
+                    ? new MostUsedIngredientDto
+                    {
+                        IngredientId = mostUsedIngredient.IngredientId,
+                        IngredientName = mostUsedIngredient.IngredientName,
+                        QuantityUsed = mostUsedIngredient.TotalQuantity,
+                        UnitOfMeasure = mostUsedIngredient.UnitOfMeasure
+                    }
+                    : null,
                 WeeklyCostData = weeklyCostData
             };
         }
+
+
 
         private async Task<decimal> GetLatestUnitPriceAsync(int ingredientId)
         {
@@ -487,15 +691,15 @@ namespace CafeManagementAPI.Services
 
                 var weekCostUsages = await _context.IngredientUsages
                     .Where(iu => iu.Ingredient.CafeId == cafeId &&
-                                 iu.UsageDate >= currentWeekStart &&
-                                 iu.UsageDate < currentWeekEnd)
+                           iu.UsageDate >= currentWeekStart &&
+                           iu.UsageDate < currentWeekEnd)
                     .ToListAsync();
 
                 decimal totalWeekCost = 0;
                 foreach (var usage in weekCostUsages)
                 {
-                    var unitPrice = GetLatestUnitPrice(usage.IngredientId);
-                    totalWeekCost += usage.QuantityUsed * unitPrice;
+                    var avgUnitPrice = await GetAverageUnitPriceForRangeAsync(usage.IngredientId, currentWeekEnd);
+                    totalWeekCost += usage.QuantityUsed * avgUnitPrice;
                 }
 
                 weeklyData.Add(new WeeklyCostDto

@@ -118,6 +118,10 @@ export const ownerApi = {
     approveEmployeeRequest: (id, data) => api.post(`/owner/employee-requests/${id}/approve`, data),
     rejectEmployeeRequest: (id) => api.post(`/owner/employee-requests/${id}/reject`),
 
+    getManagers: () => api.get('/owner/managers'),
+    getManagerSalary: (month, year) => api.get(`/owner/manager-salary?month=${month}&year=${year}`),
+    processManagerSalary: (data) => api.post('/owner/manager-salary', data),
+
     getEmployees: () => api.get('/owner/employees'),
 
     getEmployeeDetail: (id) => api.get(`/owner/employees/${id}`),
@@ -142,6 +146,7 @@ export const ownerApi = {
 
 export const managerApi = {
     getItems: () => api.get('/manager/items'),
+    getWaiters: () => api.get('/manager/waiters'),
     createItem: (data) => api.post('/manager/items', data),
     updateItem: (id, data) => api.put(`/manager/items/${id}`, data),
     deleteItem: (id) => api.delete(`/manager/items/${id}`),
@@ -166,6 +171,7 @@ export const managerApi = {
 
     getReservations: (date) => api.get(`/manager/reservations${date ? `?date=${date}` : ''}`),
     getTodayReservations: () => api.get('/manager/reservations/today'),
+    getTablesOverview: (date) => api.get(`/manager/tables-overview${date ? `?date=${date}` : ''}`),
     createReservation: (data) => api.post('/manager/reservations', data),
     cancelReservation: (id) => api.put(`/manager/reservations/${id}/cancel`),
 
@@ -176,6 +182,7 @@ export const managerApi = {
 
 export const waiterApi = {
     getMenu: () => api.get('/waiter/menu'),
+    getTables: (date) => api.get(`/waiter/tables${date ? `?date=${date}` : ''}`),
     getMyOrders: () => api.get('/waiter/orders'),
     createOrder: (data) => api.post('/waiter/orders', data),
     updateOrderStatus: (id, status) => api.put(`/waiter/orders/${id}/status`, { status }),

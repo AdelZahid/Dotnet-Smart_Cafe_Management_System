@@ -40,36 +40,56 @@ const ManagerIngredients = () => {
 
     const submitDailyEntry = async (e) => {
         e.preventDefault()
-        await managerApi.addDailyIngredientEntry({
-            purchases: [
-                {
+        
+        try {
+            const purchases = [];
+            const quantity = Number(purchaseForm.quantity) || 0;
+            if (quantity > 0) {
+                purchases.push({
                     ingredientId: Number(purchaseForm.ingredientId),
-                    quantity: Number(purchaseForm.quantity || 0),
+                    quantity: quantity,
                     unitPrice: Number(purchaseForm.unitPrice || 0),
                     supplierName: purchaseForm.supplierName || null,
                     notes: purchaseForm.notes || null,
-                },
-            ],
-            usages: [
-                {
-                    ingredientId: Number(purchaseForm.ingredientId),
-                    quantityUsed: Number(purchaseForm.quantityUsed || 0),
-                    quantityWasted: Number(purchaseForm.quantityWasted || 0),
-                    notes: purchaseForm.notes || null,
-                },
-            ],
-        })
+                });
+            }
 
-        setPurchaseForm({
-            ingredientId: '',
-            quantity: '',
-            unitPrice: '',
-            supplierName: '',
-            notes: '',
-            quantityUsed: '',
-            quantityWasted: '',
-        })
-        await load()
+            const usages = [];
+            const quantityUsed = Number(purchaseForm.quantityUsed) || 0;
+            const quantityWasted = Number(purchaseForm.quantityWasted) || 0;
+            if (quantityUsed > 0 || quantityWasted > 0) {
+                usages.push({
+                    ingredientId: Number(purchaseForm.ingredientId),
+                    quantityUsed: quantityUsed,
+                    quantityWasted: quantityWasted,
+                    notes: purchaseForm.notes || null,
+                });
+            }
+
+            if (purchases.length === 0 && usages.length === 0) {
+                alert("Please enter a valid purchase or usage quantity.");
+                return;
+            }
+
+            await managerApi.addDailyIngredientEntry({
+                purchases: purchases,
+                usages: usages,
+            })
+
+            setPurchaseForm({
+                ingredientId: '',
+                quantity: '',
+                unitPrice: '',
+                supplierName: '',
+                notes: '',
+                quantityUsed: '',
+                quantityWasted: '',
+            })
+            await load()
+        } catch (error) {
+            console.error("Failed to add daily entry:", error)
+            alert("Failed to submit entry. " + (error.response?.data?.message || ""));
+        }
     }
 
     return (

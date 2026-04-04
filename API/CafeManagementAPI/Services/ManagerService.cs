@@ -38,12 +38,13 @@ namespace CafeManagementAPI.Services
         Task<ReservationResponseDto> CreateReservationAsync(int cafeId, ReservationCreateDto request);
         Task<List<ReservationResponseDto>> GetReservationsAsync(int cafeId, DateTime? date);
         Task<List<TodaysReservationDto>> GetTodaysReservationsAsync(int cafeId);
+        Task<List<TableOverviewDto>> GetTableOverviewAsync(int cafeId, DateTime? date);
         Task<bool> CancelReservationAsync(int cafeId, int reservationId);
 
         // Salary
         Task<SalaryPaymentResponseDto> ProcessSalaryPaymentAsync(int cafeId, SalaryPaymentCreateDto request);
         Task<List<SalaryPaymentResponseDto>> GetSalaryPaymentsAsync(int cafeId, int month, int year);
-
+        Task<List<EmployeeBasicDto>> GetWaitersAsync(int cafeId);
     }
 
     public class ManagerService : IManagerService
@@ -55,7 +56,7 @@ namespace CafeManagementAPI.Services
             _context = context;
         }
 
-        #region Items
+        
         public async Task<ItemResponseDto> CreateItemAsync(int cafeId, ItemCreateDto request)
         {
             var item = new MenuItem
@@ -91,7 +92,7 @@ namespace CafeManagementAPI.Services
             }
             return result;
         }
-
+        #region UpdateItem
         public async Task<ItemResponseDto?> UpdateItemAsync(int cafeId, int itemId, ItemUpdateDto request)
         {
             var item = await _context.MenuItems
@@ -127,6 +128,7 @@ namespace CafeManagementAPI.Services
 
             return orders.Select(MapToOrderResponseDto).ToList();
         }
+        #endregion
 
         public async Task<List<OrderResponseDto>> GetOnlineOrdersAsync(int cafeId)
         {
@@ -154,7 +156,7 @@ namespace CafeManagementAPI.Services
 
             return true;
         }
-        #endregion
+        
 
         #region Purchased Orders
         public async Task<List<PurchasedOrderDto>> GetPurchasedOrdersAsync(int cafeId, DateTime? startDate, DateTime? endDate)
@@ -216,6 +218,7 @@ namespace CafeManagementAPI.Services
                 RefundAmount = o.Status == "Refunded" ? o.TotalAmount : null
             }).ToList();
         }
+        #endregion
 
         public async Task<bool> ProcessRefundAsync(int cafeId, int orderId, decimal refundAmount, string? reason)
         {
@@ -231,7 +234,7 @@ namespace CafeManagementAPI.Services
             await _context.SaveChangesAsync();
             return true;
         }
-        #endregion
+        
 
         #region Ingredients
         public async Task<IngredientResponseDto> CreateIngredientAsync(int cafeId, IngredientCreateDto request)
@@ -251,6 +254,7 @@ namespace CafeManagementAPI.Services
 
             return MapToIngredientResponseDto(ingredient);
         }
+        #endregion
 
         public async Task<List<IngredientResponseDto>> GetIngredientsAsync(int cafeId)
         {
@@ -263,72 +267,111 @@ namespace CafeManagementAPI.Services
 
         public async Task<bool> AddDailyIngredientEntryAsync(int cafeId, DailyIngredientEntryDto request)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
-
-            try
+            if (request == null)
             {
-                // Add purchases
-                foreach (var purchase in request.Purchases)
-                {
-                    var ingredient = await _context.Ingredients
-                        .FirstOrDefaultAsync(i => i.CafeId == cafeId && i.Id == purchase.IngredientId);
-
-                    if (ingredient == null) continue;
-
-                    var purchaseRecord = new IngredientPurchase
-                    {
-                        IngredientId = purchase.IngredientId,
-                        Quantity = purchase.Quantity,
-                        UnitPrice = purchase.UnitPrice,
-                        SupplierName = purchase.SupplierName,
-                        Notes = purchase.Notes,
-                        PurchaseDate = DateTime.UtcNow
-                    };
-
-                    _context.IngredientPurchases.Add(purchaseRecord);
-
-                    // Update current stock
-                    ingredient.CurrentStock += purchase.Quantity;
-                    ingredient.UpdatedAt = DateTime.UtcNow;
-                }
-
-                // Add usages
-                foreach (var usage in request.Usages)
-                {
-                    var ingredient = await _context.Ingredients
-                        .FirstOrDefaultAsync(i => i.CafeId == cafeId && i.Id == usage.IngredientId);
-
-                    if (ingredient == null) continue;
-
-                    var usageRecord = new IngredientUsage
-                    {
-                        IngredientId = usage.IngredientId,
-                        QuantityUsed = usage.QuantityUsed,
-                        QuantityWasted = usage.QuantityWasted,
-                        Notes = usage.Notes,
-                        UsageDate = DateTime.UtcNow
-                    };
-
-                    _context.IngredientUsages.Add(usageRecord);
-
-                    // Update current stock
-                    ingredient.CurrentStock -= (usage.QuantityUsed + usage.QuantityWasted);
-                    ingredient.UpdatedAt = DateTime.UtcNow;
-                }
-
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-                return true;
+                throw new InvalidOperationException("Daily entry payload is required.");
             }
-            catch
+
+            var hasPurchases = request.Purchases?.Any(p => p.Quantity > 0 && p.IngredientId > 0) == true;
+            var hasUsages = request.Usages?.Any(u => (u.QuantityUsed > 0 || u.QuantityWasted > 0) && u.IngredientId > 0) == true;
+
+            if (!hasPurchases && !hasUsages)
             {
-                await transaction.RollbackAsync();
-                return false;
+                throw new InvalidOperationException("Daily entry must include at least one valid purchase or usage.");
             }
+
+            var strategy = _context.Database.CreateExecutionStrategy();
+
+            return await strategy.ExecuteAsync(async () =>
+            {
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+
+                try
+                {
+                    foreach (var purchase in request.Purchases)
+                    {
+                        if (purchase.IngredientId <= 0 || purchase.Quantity <= 0) continue;
+
+                        var ingredient = await _context.Ingredients
+                            .FirstOrDefaultAsync(i => i.CafeId == cafeId && i.Id == purchase.IngredientId);
+
+                        if (ingredient == null)
+                        {
+                            throw new InvalidOperationException($"Ingredient {purchase.IngredientId} not found for this cafe.");
+                        }
+
+                        _context.IngredientPurchases.Add(new IngredientPurchase
+                        {
+                            IngredientId = purchase.IngredientId,
+                            Quantity = purchase.Quantity,
+                            UnitPrice = purchase.UnitPrice,
+                            SupplierName = purchase.SupplierName,
+                            Notes = purchase.Notes,
+                            PurchaseDate = DateTime.UtcNow
+                        });
+
+                        ingredient.CurrentStock += purchase.Quantity;
+                        ingredient.UpdatedAt = DateTime.UtcNow;
+                    }
+
+                    foreach (var usage in request.Usages)
+                    {
+                        if (usage.IngredientId <= 0 || (usage.QuantityUsed <= 0 && usage.QuantityWasted <= 0)) continue;
+
+                        var ingredient = await _context.Ingredients
+                            .FirstOrDefaultAsync(i => i.CafeId == cafeId && i.Id == usage.IngredientId);
+
+                        if (ingredient == null)
+                        {
+                            throw new InvalidOperationException($"Ingredient {usage.IngredientId} not found for this cafe.");
+                        }
+
+                        var today = DateTime.UtcNow.Date;
+                        var existingUsage = await _context.IngredientUsages
+                            .FirstOrDefaultAsync(iu => iu.IngredientId == usage.IngredientId && iu.UsageDate.Date == today);
+
+                        if (existingUsage != null)
+                        {
+                            existingUsage.QuantityUsed += usage.QuantityUsed;
+                            existingUsage.QuantityWasted += usage.QuantityWasted;
+
+                            if (!string.IsNullOrEmpty(usage.Notes))
+                            {
+                                existingUsage.Notes = string.IsNullOrEmpty(existingUsage.Notes)
+                                    ? usage.Notes
+                                    : existingUsage.Notes + " | " + usage.Notes;
+                            }
+                        }
+                        else
+                        {
+                            _context.IngredientUsages.Add(new IngredientUsage
+                            {
+                                IngredientId = usage.IngredientId,
+                                QuantityUsed = usage.QuantityUsed,
+                                QuantityWasted = usage.QuantityWasted,
+                                Notes = usage.Notes,
+                                UsageDate = today
+                            });
+                        }
+
+                        ingredient.CurrentStock -= (usage.QuantityUsed + usage.QuantityWasted);
+                        ingredient.UpdatedAt = DateTime.UtcNow;
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new InvalidOperationException("Failed to add daily entry.", ex);
+                }
+            });
         }
-        #endregion
+        
 
-        #region Additional Costs
+        #region CreateAdditional Costs
         public async Task<AdditionalCostResponseDto> CreateAdditionalCostAsync(int cafeId, AdditionalCostCreateDto request)
         {
             var cost = new AdditionalCost
@@ -347,7 +390,9 @@ namespace CafeManagementAPI.Services
 
             return MapToAdditionalCostResponseDto(cost);
         }
+        #endregion
 
+        #region Additional Costs
         public async Task<List<AdditionalCostResponseDto>> GetAdditionalCostsAsync(int cafeId, DateTime? startDate, DateTime? endDate)
         {
             var query = _context.AdditionalCosts
@@ -365,7 +410,29 @@ namespace CafeManagementAPI.Services
         }
         #endregion
 
-        #region Reservations
+        #region Waiters
+        public async Task<List<EmployeeBasicDto>> GetWaitersAsync(int cafeId)
+        {
+            var waiters = await _context.Employees
+                .Where(e => e.CafeId == cafeId && e.Designation == "Waiter" && e.IsActive)
+                .OrderBy(e => e.Name)
+                .ToListAsync();
+
+            return waiters.Select(e => new EmployeeBasicDto
+            {
+                Id = e.Id,
+                EmployeeId = e.EmployeeId,
+                Name = e.Name,
+                Designation = e.Designation,
+                Shift = e.Shift,
+                Salary = e.Salary
+            }).ToList();
+        }
+        #endregion
+
+
+
+       
         public async Task<ReservationResponseDto> CreateReservationAsync(int cafeId, ReservationCreateDto request)
         {
             // Check for conflicting reservations
@@ -448,6 +515,51 @@ namespace CafeManagementAPI.Services
             }).ToList();
         }
 
+        public async Task<List<TableOverviewDto>> GetTableOverviewAsync(int cafeId, DateTime? date)
+        {
+            var targetDate = (date ?? DateTime.UtcNow).Date;
+
+            var tables = await _context.Tables
+                .Where(t => t.CafeId == cafeId)
+                .Include(t => t.Reservations.Where(r => r.ReservationDate.Date == targetDate))
+                .OrderBy(t => t.TableNumber)
+                .ToListAsync();
+
+            return tables.Select(t =>
+            {
+                var reservations = t.Reservations
+                    .OrderBy(r => r.StartTime)
+                    .Select(r => new TableReservationInfoDto
+                    {
+                        ReservationId = r.Id,
+                        CustomerName = r.CustomerName,
+                        CustomerPhone = r.CustomerPhone,
+                        ReservationDate = r.ReservationDate,
+                        StartTime = r.StartTime,
+                        EndTime = r.EndTime,
+                        NumberOfGuests = r.NumberOfGuests,
+                        Status = r.Status
+                    })
+                    .ToList();
+
+                var status = !t.IsActive
+                    ? "Inactive"
+                    : reservations.Any(r => r.Status == "Confirmed")
+                        ? "Reserved"
+                        : "Available";
+
+                return new TableOverviewDto
+                {
+                    TableId = t.Id,
+                    TableNumber = t.TableNumber,
+                    Capacity = t.Capacity,
+                    IsActive = t.IsActive,
+                    Status = status,
+                    Reservations = reservations
+                };
+            }).ToList();
+        }
+
         public async Task<bool> CancelReservationAsync(int cafeId, int reservationId)
         {
             var reservation = await _context.Reservations
@@ -460,9 +572,7 @@ namespace CafeManagementAPI.Services
 
             return true;
         }
-        #endregion
 
-        #region Salary
         public async Task<SalaryPaymentResponseDto> ProcessSalaryPaymentAsync(int cafeId, SalaryPaymentCreateDto request)
         {
             var employee = await _context.Employees
@@ -542,7 +652,7 @@ namespace CafeManagementAPI.Services
                 PaymentMethod = sp.PaymentMethod
             }).ToList();
         }
-        #endregion
+        
 
 
 
@@ -632,7 +742,7 @@ namespace CafeManagementAPI.Services
                 CreatedAt = reservation.CreatedAt
             };
         }
-        
+
 
         public async Task<bool> DeleteItemAsync(int cafeId, int itemId)
         {
@@ -645,7 +755,7 @@ namespace CafeManagementAPI.Services
             await _context.SaveChangesAsync();
             return true;
         }
-       
+
 
 
     }

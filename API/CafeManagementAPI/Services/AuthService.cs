@@ -21,6 +21,10 @@ namespace CafeManagementAPI.Services
 
     public class AuthService : IAuthService
     {
+        private const string DefaultJwtKey = "YourSuperSecretKey1234567890123456";
+        private const string DefaultJwtIssuer = "CafeManagementAPI";
+        private const string DefaultJwtAudience = "CafeManagementClient";
+
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
 
@@ -30,7 +34,8 @@ namespace CafeManagementAPI.Services
             _configuration = configuration;
         }
 
-        public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request)
+        public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request
+        )
         {
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == request.Email && u.IsActive);
@@ -217,60 +222,79 @@ namespace CafeManagementAPI.Services
 
         public async Task<AuthResponseDto> RegisterOwnerAsync(RegisterOwnerRequestDto request)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-                return new AuthResponseDto { Success = false, Message = "Email already registered" };
-
-            var user = new User
+            try
             {
-                Email = request.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                Role = "Owner",
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            };
+                if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+                    return new AuthResponseDto { Success = false, Message = "Email already registered" };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            var cafeProfile = new CafeProfile
-            {
-                OwnerId = user.Id,
-                CafeName = request.CafeName,
-                OwnerName = request.OwnerName,
-                Location = request.Location,
-                Phone = request.Phone,
-                Email = request.Email,
-                ImageUrl = request.ImageUrl,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            _context.CafeProfiles.Add(cafeProfile);
-            await _context.SaveChangesAsync();
-
-            for (int i = 1; i <= 10; i++)
-            {
-                _context.Tables.Add(new Table
+                var user = new User
                 {
-                    CafeId = cafeProfile.Id,
-                    TableNumber = $"T{i:D2}",
-                    Capacity = 4,
-                    IsActive = true
-                });
+                    Email = request.Email,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                    Role = "Owner",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                var cafeProfile = new CafeProfile
+                {
+                    OwnerId = user.Id,
+                    CafeName = request.CafeName,
+                    OwnerName = request.OwnerName,
+                    Location = request.Location,
+                    Phone = request.Phone,
+                    Email = request.Email,
+                    ImageUrl = request.ImageUrl,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                _context.CafeProfiles.Add(cafeProfile);
+                await _context.SaveChangesAsync();
+
+                for (int i = 1; i <= 10; i++)
+                {
+                    _context.Tables.Add(new Table
+                    {
+                        CafeId = cafeProfile.Id,
+                        TableNumber = $"T{i:D2}",
+                        Capacity = 4,
+                        IsActive = true
+                    });
+                }
+
+                await _context.SaveChangesAsync();
+
+                var token = await GenerateJwtTokenForUserAsync(user);
+                var userInfo = await GetUserInfoAsync(user);
+
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Registration successful",
+                    Token = token,
+                    User = userInfo
+                };
             }
-
-            await _context.SaveChangesAsync();
-
-            var token = await GenerateJwtTokenForUserAsync(user);
-            var userInfo = await GetUserInfoAsync(user);
-
-            return new AuthResponseDto
+            catch (DbUpdateException)
             {
-                Success = true,
-                Message = "Registration successful",
-                Token = token,
-                User = userInfo
-            };
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Could not save registration. Please verify your data and try again."
+                };
+            }
+            catch (Exception)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Registration failed due to server configuration. Please contact support."
+                };
+            }
         }
 
         private async Task<string> GenerateJwtTokenForUserAsync(User user)
@@ -298,12 +322,13 @@ namespace CafeManagementAPI.Services
                 }
             }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+            var jwtSettings = GetJwtSettings();
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: jwtSettings.Issuer,
+                audience: jwtSettings.Audience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds
@@ -323,18 +348,32 @@ namespace CafeManagementAPI.Services
                 new Claim("EmployeeId", employee.EmployeeId)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+            var jwtSettings = GetJwtSettings();
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: jwtSettings.Issuer,
+                audience: jwtSettings.Audience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private (string Key, string Issuer, string Audience) GetJwtSettings()
+        {
+            var key = _configuration["Jwt:Key"];
+            var issuer = _configuration["Jwt:Issuer"];
+            var audience = _configuration["Jwt:Audience"];
+
+            return (
+                string.IsNullOrWhiteSpace(key) ? DefaultJwtKey : key,
+                string.IsNullOrWhiteSpace(issuer) ? DefaultJwtIssuer : issuer,
+                string.IsNullOrWhiteSpace(audience) ? DefaultJwtAudience : audience
+            );
         }
 
         private async Task<UserInfoDto> GetUserInfoAsync(User user)

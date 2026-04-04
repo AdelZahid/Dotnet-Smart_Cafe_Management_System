@@ -96,6 +96,35 @@ builder.Services.AddScoped<IWaiterService, WaiterService>();
 
 var app = builder.Build();
 
+// Return structured JSON for any unhandled error before controller catch blocks.
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var exceptionFeature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+
+        if (exceptionFeature?.Error != null)
+        {
+            logger.LogError(exceptionFeature.Error,
+                "Unhandled exception for {Method} {Path}. TraceId: {TraceId}",
+                context.Request.Method,
+                context.Request.Path,
+                context.TraceIdentifier);
+        }
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            success = false,
+            message = "Unexpected server error",
+            traceId = context.TraceIdentifier
+        });
+    });
+});
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

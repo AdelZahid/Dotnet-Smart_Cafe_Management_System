@@ -145,6 +145,42 @@ namespace CafeManagementAPI.Controllers
         }
 
         [HttpDelete("employees/{id}")]
+        public async Task<IActionResult> DeleteEmployee(int id)
+        {
+            try
+            {
+                var cafeId = GetCafeId();
+                var result = await _ownerService.DeleteEmployeeAsync(cafeId, id);
+
+                if (!result)
+                    return NotFound(new { message = "Employee not found" });
+
+                return Ok(new { message = "Employee deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        #endregion
+
+        #region Sales Reports
+
+        [HttpGet("sales-report")]
+        public async Task<IActionResult> GetSalesReport([FromQuery] DateRangeRequestDto request)
+        {
+            try
+            {
+                var cafeId = GetCafeId();
+                var report = await _ownerService.GetSalesReportAsync(cafeId, request);
+                return Ok(report);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
         #endregion
 

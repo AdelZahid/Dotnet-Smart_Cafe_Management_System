@@ -36,6 +36,26 @@ namespace CafeManagementAPI.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("CafeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CostDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CostType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsRecurring")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 

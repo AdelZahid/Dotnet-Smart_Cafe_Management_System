@@ -41,7 +41,7 @@ CREATE TABLE Users (
     Email NVARCHAR(255) NOT NULL UNIQUE,
     PasswordHash NVARCHAR(500) NULL, -- NULL for Google OAuth users
     GoogleId NVARCHAR(255) NULL,
-    Role NVARCHAR(50) NOT NULL CHECK (Role IN ('Manager', 'Waiter')),
+    Role NVARCHAR(50) NOT NULL CHECK (Role IN ('Owner', 'Manager', 'Waiter')),
     IsActive BIT DEFAULT 1,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     LastLoginAt DATETIME2 NULL

@@ -43,19 +43,11 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Configure Database - FIXED with error handling
+// Configure Database with a simple options delegate to avoid nested closure IL issues.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseSqlServer(connectionString, sqlOptions =>
-    {
-        sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(30),
-            errorNumbersToAdd: null);
-    });
-});
+    options.UseSqlServer(connectionString));
 
 // Configure JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "YourSuperSecretKey1234567890123456";
@@ -96,23 +88,11 @@ builder.Services.AddScoped<IWaiterService, WaiterService>();
 
 var app = builder.Build();
 
-// Return structured JSON for any unhandled error before controller catch blocks.
+// Keep error handler DI-free so it still runs even when service resolution is broken.
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
     {
-        var exceptionFeature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
-        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-
-        if (exceptionFeature?.Error != null)
-        {
-            logger.LogError(exceptionFeature.Error,
-                "Unhandled exception for {Method} {Path}. TraceId: {TraceId}",
-                context.Request.Method,
-                context.Request.Path,
-                context.TraceIdentifier);
-        }
-
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         context.Response.ContentType = "application/json";
 
@@ -133,20 +113,17 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseCors("AllowAll");
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
-// Apply migrations automatically with error handling
+// Apply migrations automatically with error handling before the app starts serving requests.
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var logger = services.GetRequiredService<ILogger<Program>>();
-    
+
     try
     {
         var dbContext = services.GetRequiredService<ApplicationDbContext>();
@@ -155,27 +132,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "An error occurred while migrating the database. " +
-            "Please ensure SQL Server is running and the connection string is correct. " +
-            "Connection String: {ConnectionString}", connectionString);
-        
-        // Uncomment the line below if you want to prevent app startup when DB is unavailable
-        // throw;
-    }
-}
-
-// Add this temporarily before app.Run() to test connection
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    try
-    {
-        var canConnect = dbContext.Database.CanConnect();
-        Console.WriteLine($"Database connection test: {(canConnect ? "SUCCESS" : "FAILED")}");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Database connection error: {ex.Message}");
+        logger.LogError(ex, "An error occurred while migrating the database.");
     }
 }
 

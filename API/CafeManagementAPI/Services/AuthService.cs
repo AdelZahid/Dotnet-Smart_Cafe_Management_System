@@ -27,11 +27,13 @@ namespace CafeManagementAPI.Services
 
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthService> _logger;
 
-        public AuthService(ApplicationDbContext context, IConfiguration configuration)
+        public AuthService(ApplicationDbContext context, IConfiguration configuration, ILogger<AuthService> logger)
         {
             _context = context;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request
@@ -279,16 +281,18 @@ namespace CafeManagementAPI.Services
                     User = userInfo
                 };
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError(ex, "Owner registration DB failure for email {Email}", request.Email);
                 return new AuthResponseDto
                 {
                     Success = false,
                     Message = "Could not save registration. Please verify your data and try again."
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Owner registration unexpected failure for email {Email}", request.Email);
                 return new AuthResponseDto
                 {
                     Success = false,

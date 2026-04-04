@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,9 +14,11 @@ const Register = () => {
     const { toast } = useToast()
     const { setAuth } = useAuthStore()
 
+    // Loading states
     const [ownerLoading, setOwnerLoading] = useState(false)
     const [employeeLoading, setEmployeeLoading] = useState(false)
 
+    // Owner form
     const [ownerForm, setOwnerForm] = useState({
         email: '',
         password: '',
@@ -29,22 +30,26 @@ const Register = () => {
         imageUrl: '',
     })
 
+    // Employee form
     const [employeeForm, setEmployeeForm] = useState({
         email: '',
         cafeId: '',
         role: 'Waiter',
     })
 
+    // Handle owner input change
     const handleOwnerChange = (e) => {
         const { name, value } = e.target
         setOwnerForm((prev) => ({ ...prev, [name]: value }))
     }
 
+    // Handle employee input change
     const handleEmployeeChange = (e) => {
         const { name, value } = e.target
         setEmployeeForm((prev) => ({ ...prev, [name]: value }))
     }
 
+    // Owner submit
     const handleOwnerSubmit = async (e) => {
         e.preventDefault()
 
@@ -82,7 +87,9 @@ const Register = () => {
         } catch (error) {
             toast({
                 title: 'Registration failed',
-                description: error.response?.data?.message || 'Could not create owner account.',
+                description:
+                    error.response?.data?.message ||
+                    'Could not create owner account.',
                 variant: 'destructive',
             })
         } finally {
@@ -90,6 +97,7 @@ const Register = () => {
         }
     }
 
+    // Employee submit
     const handleEmployeeSubmit = async (e) => {
         e.preventDefault()
         setEmployeeLoading(true)
@@ -105,14 +113,17 @@ const Register = () => {
 
             toast({
                 title: 'Request submitted',
-                description: 'Your employee access request was sent to the owner.',
+                description:
+                    'Your employee access request was sent to the owner.',
             })
 
             navigate('/login?type=employee')
         } catch (error) {
             toast({
                 title: 'Request failed',
-                description: error.response?.data?.message || 'Could not submit employee request.',
+                description:
+                    error.response?.data?.message ||
+                    'Could not submit employee request.',
                 variant: 'destructive',
             })
         } finally {
@@ -122,16 +133,26 @@ const Register = () => {
 
     return (
         <div className="min-h-screen bg-amber-50 flex flex-col items-center justify-center px-4">
+
+            {/* Logo */}
             <Link to="/" className="flex items-center space-x-2 mb-8">
                 <div className="bg-amber-100 p-3 rounded-xl shadow-sm">
                     <Coffee className="h-8 w-8 text-amber-600" />
                 </div>
-                <span className="font-bold text-3xl tracking-tight text-gray-900">Cafems</span>
+                <span className="font-bold text-3xl tracking-tight text-gray-900">
+                    Cafems
+                </span>
             </Link>
+
+            {/* Card */}
             <div className="w-full max-w-md rounded-2xl bg-white border shadow-lg p-6">
-                <h1 className="text-2xl font-bold text-gray-900 text-center">Owner Registration</h1>
+                <h1 className="text-2xl font-bold text-center">
+                    Owner Registration
+                </h1>
 
                 <Tabs defaultValue="owner" className="w-full">
+
+                    {/* Tabs */}
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="owner" className="gap-2">
                             <UserCog className="h-4 w-4" />
@@ -143,8 +164,13 @@ const Register = () => {
                         </TabsTrigger>
                     </TabsList>
 
+                    {/* OWNER TAB */}
                     <TabsContent value="owner" className="mt-6">
-                        <form onSubmit={handleOwnerSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <form
+                            onSubmit={handleOwnerSubmit}
+                            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                        >
+                            {/* Owner Name */}
                             <div className="space-y-2">
                                 <Label htmlFor="ownerName">Owner Name</Label>
                                 <Input
@@ -152,11 +178,11 @@ const Register = () => {
                                     name="ownerName"
                                     value={ownerForm.ownerName}
                                     onChange={handleOwnerChange}
-                                    autoComplete="name"
                                     required
                                 />
                             </div>
 
+                            {/* Cafe Name */}
                             <div className="space-y-2">
                                 <Label htmlFor="cafeName">Cafe Name</Label>
                                 <Input
@@ -168,6 +194,7 @@ const Register = () => {
                                 />
                             </div>
 
+                            {/* Email */}
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
@@ -176,11 +203,11 @@ const Register = () => {
                                     type="email"
                                     value={ownerForm.email}
                                     onChange={handleOwnerChange}
-                                    autoComplete="email"
                                     required
                                 />
                             </div>
 
+                            {/* Phone */}
                             <div className="space-y-2">
                                 <Label htmlFor="phone">Phone</Label>
                                 <Input
@@ -188,10 +215,10 @@ const Register = () => {
                                     name="phone"
                                     value={ownerForm.phone}
                                     onChange={handleOwnerChange}
-                                    autoComplete="tel"
                                 />
                             </div>
 
+                            {/* Location */}
                             <div className="space-y-2 md:col-span-2">
                                 <Label htmlFor="location">Location</Label>
                                 <Input
@@ -203,6 +230,7 @@ const Register = () => {
                                 />
                             </div>
 
+                            {/* Image */}
                             <div className="space-y-2 md:col-span-2">
                                 <Label htmlFor="imageUrl">Image URL</Label>
                                 <Input
@@ -213,32 +241,31 @@ const Register = () => {
                                 />
                             </div>
 
+                            {/* Password */}
                             <div className="space-y-2">
-                                <Label htmlFor="password">Password</Label>
+                                <Label>Password</Label>
                                 <Input
-                                    id="password"
                                     name="password"
                                     type="password"
                                     value={ownerForm.password}
                                     onChange={handleOwnerChange}
-                                    autoComplete="new-password"
                                     required
                                 />
                             </div>
 
+                            {/* Confirm Password */}
                             <div className="space-y-2">
-                                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                                <Label>Confirm Password</Label>
                                 <Input
-                                    id="confirmPassword"
                                     name="confirmPassword"
                                     type="password"
                                     value={ownerForm.confirmPassword}
                                     onChange={handleOwnerChange}
-                                    autoComplete="new-password"
                                     required
                                 />
                             </div>
 
+                            {/* Buttons */}
                             <div className="md:col-span-2 space-y-3 pt-2">
                                 <Button
                                     type="submit"
@@ -259,85 +286,59 @@ const Register = () => {
                                     type="button"
                                     variant="outline"
                                     className="w-full"
-                                    onClick={() => navigate('/login?type=owner')}
+                                    onClick={() =>
+                                        navigate('/login?type=owner')
+                                    }
                                 >
-                                    Already have an owner account? Sign in
+                                    Already have an account? Sign in
                                 </Button>
                             </div>
                         </form>
                     </TabsContent>
 
+                    {/* EMPLOYEE TAB */}
                     <TabsContent value="employee" className="mt-6">
-                        <form onSubmit={handleEmployeeSubmit} className="space-y-4 max-w-xl mx-auto">
-                            <div className="space-y-2">
-                                <Label htmlFor="employeeEmail">Email</Label>
-                                <Input
-                                    id="employeeEmail"
-                                    name="email"
-                                    type="email"
-                                    value={employeeForm.email}
-                                    onChange={handleEmployeeChange}
-                                    autoComplete="email"
-                                    required
-                                />
-                            </div>
+                        <form
+                            onSubmit={handleEmployeeSubmit}
+                            className="space-y-4"
+                        >
+                            <Input
+                                name="email"
+                                type="email"
+                                value={employeeForm.email}
+                                onChange={handleEmployeeChange}
+                                placeholder="Email"
+                                required
+                            />
 
-                            <div className="space-y-2">
-                                <Label htmlFor="cafeId">Shop ID / Cafe ID</Label>
-                                <Input
-                                    id="cafeId"
-                                    name="cafeId"
-                                    type="number"
-                                    value={employeeForm.cafeId}
-                                    onChange={handleEmployeeChange}
-                                    required
-                                />
-                            </div>
+                            <Input
+                                name="cafeId"
+                                type="number"
+                                value={employeeForm.cafeId}
+                                onChange={handleEmployeeChange}
+                                placeholder="Cafe ID"
+                                required
+                            />
 
-                            <div className="space-y-2">
-                                <Label htmlFor="role">Requested Role</Label>
-                                <select
-                                    id="role"
-                                    name="role"
-                                    value={employeeForm.role}
-                                    onChange={handleEmployeeChange}
-                                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                >
-                                    <option value="Waiter">Waiter</option>
-                                    <option value="Manager">Manager</option>
-                                </select>
-                            </div>
+                            <select
+                                name="role"
+                                value={employeeForm.role}
+                                onChange={handleEmployeeChange}
+                                className="w-full border px-3 py-2 rounded-md"
+                            >
+                                <option value="Waiter">Waiter</option>
+                                <option value="Manager">Manager</option>
+                            </select>
 
-                            <div className="rounded-lg border bg-amber-50 p-4 text-sm text-amber-900">
-                                With your current backend, employee request supports email + cafe ID + role request.
-                                Password + employee ID based approval flow is not implemented yet in the API.
-                            </div>
-
-                            <div className="space-y-3 pt-2">
-                                <Button
-                                    type="submit"
-                                    className="w-full bg-amber-600 hover:bg-amber-700"
-                                    disabled={employeeLoading}
-                                >
-                                    {employeeLoading ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Sending request...
-                                        </>
-                                    ) : (
-                                        'Request Employee Access'
-                                    )}
-                                </Button>
-
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="w-full"
-                                    onClick={() => navigate('/login?type=employee')}
-                                >
-                                    Already approved? Sign in
-                                </Button>
-                            </div>
+                            <Button
+                                type="submit"
+                                className="w-full bg-amber-600 hover:bg-amber-700"
+                                disabled={employeeLoading}
+                            >
+                                {employeeLoading
+                                    ? 'Sending request...'
+                                    : 'Request Access'}
+                            </Button>
                         </form>
                     </TabsContent>
                 </Tabs>

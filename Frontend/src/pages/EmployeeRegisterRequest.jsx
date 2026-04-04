@@ -48,7 +48,9 @@ const EmployeeRegisterRequest = () => {
                 imageUrl: form.imageUrl || null,
             })
 
-            setMessage('Your request has been sent to the owner for approval.')
+            setMessage(
+                'Your request has been sent to the owner for approval.'
+            )
 
             setForm({
                 name: '',
@@ -62,7 +64,10 @@ const EmployeeRegisterRequest = () => {
                 imageUrl: '',
             })
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to send employee request')
+            setError(
+                err.response?.data?.message ||
+                    'Failed to send employee request'
+            )
         } finally {
             setLoading(false)
         }
@@ -70,145 +75,128 @@ const EmployeeRegisterRequest = () => {
 
     return (
         <div className="min-h-screen bg-amber-50 flex items-center justify-center px-4 py-10">
-            <div className="w-full max-w-3xl rounded-3xl bg-white border shadow-lg p-8">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Employee Request Access</h1>
-                    <p className="mt-2 text-gray-500">
-                        Enter your information and the cafe email. Only that owner will receive your request.
-                    </p>
-                </div>
+            <div className="w-full max-w-3xl bg-white border shadow-lg rounded-3xl p-8">
+
+                <h1 className="text-3xl font-bold mb-4">
+                    Employee Request Access
+                </h1>
 
                 {message && (
-                    <div className="mb-5 rounded-xl bg-green-50 px-4 py-3 text-green-700">
+                    <div className="bg-green-50 text-green-700 p-3 rounded-xl mb-4">
                         {message}
                     </div>
                 )}
 
                 {error && (
-                    <div className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-red-700">
+                    <div className="bg-red-50 text-red-700 p-3 rounded-xl mb-4">
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={submit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700">Name</label>
-                        <input
-                            type="text"
-                            className="w-full rounded-xl border px-4 py-3"
-                            value={form.name}
-                            onChange={(e) => handleChange('name', e.target.value)}
-                            required
-                        />
-                    </div>
+                <form
+                    onSubmit={submit}
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                >
+                    <input
+                        placeholder="Name"
+                        value={form.name}
+                        onChange={(e) =>
+                            handleChange('name', e.target.value)
+                        }
+                        required
+                    />
 
-                    <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700">Age</label>
-                        <input
-                            type="number"
-                            className="w-full rounded-xl border px-4 py-3"
-                            value={form.age}
-                            onChange={(e) => handleChange('age', e.target.value)}
-                        />
-                    </div>
+                    <input
+                        placeholder="Age"
+                        type="number"
+                        value={form.age}
+                        onChange={(e) =>
+                            handleChange('age', e.target.value)
+                        }
+                    />
 
-                    <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700">Sex</label>
-                        <select
-                            className="w-full rounded-xl border px-4 py-3"
-                            value={form.sex}
-                            onChange={(e) => handleChange('sex', e.target.value)}
-                        >
-                            <option value="">Select sex</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
+                    <select
+                        value={form.sex}
+                        onChange={(e) =>
+                            handleChange('sex', e.target.value)
+                        }
+                    >
+                        <option value="">Sex</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                    </select>
 
-                    <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700">Your Email</label>
-                        <input
-                            type="email"
-                            className="w-full rounded-xl border px-4 py-3"
-                            value={form.email}
-                            onChange={(e) => handleChange('email', e.target.value)}
-                            required
-                        />
-                    </div>
+                    <input
+                        type="email"
+                        placeholder="Your Email"
+                        value={form.email}
+                        onChange={(e) =>
+                            handleChange('email', e.target.value)
+                        }
+                        required
+                    />
 
-                    <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700">Cafe Email</label>
-                        <input
-                            type="email"
-                            className="w-full rounded-xl border px-4 py-3"
-                            placeholder="projectgpt057@gmail.com"
-                            value={form.cafeEmail}
-                            onChange={(e) => handleChange('cafeEmail', e.target.value)}
-                            required
-                        />
-                    </div>
+                    <input
+                        type="email"
+                        placeholder="Cafe Email"
+                        value={form.cafeEmail}
+                        onChange={(e) =>
+                            handleChange('cafeEmail', e.target.value)
+                        }
+                        required
+                    />
 
-                    <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700">Phone</label>
-                        <input
-                            type="text"
-                            className="w-full rounded-xl border px-4 py-3"
-                            value={form.phone}
-                            onChange={(e) => handleChange('phone', e.target.value)}
-                        />
-                    </div>
+                    <input
+                        placeholder="Phone"
+                        value={form.phone}
+                        onChange={(e) =>
+                            handleChange('phone', e.target.value)
+                        }
+                    />
 
-                    <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700">Designation</label>
-                        <select
-                            className="w-full rounded-xl border px-4 py-3"
-                            value={form.designation}
-                            onChange={(e) => handleChange('designation', e.target.value)}
-                            required
-                        >
-                            <option value="Waiter">Waiter</option>
-                            <option value="Manager">Manager</option>
-                        </select>
-                    </div>
+                    <input
+                        placeholder="Address"
+                        value={form.address}
+                        onChange={(e) =>
+                            handleChange('address', e.target.value)
+                        }
+                    />
 
-                    <div className="md:col-span-2">
-                        <label className="mb-2 block text-sm font-medium text-gray-700">Address</label>
-                        <input
-                            type="text"
-                            className="w-full rounded-xl border px-4 py-3"
-                            value={form.address}
-                            onChange={(e) => handleChange('address', e.target.value)}
-                        />
-                    </div>
+                    <select
+                        value={form.designation}
+                        onChange={(e) =>
+                            handleChange('designation', e.target.value)
+                        }
+                    >
+                        <option>Waiter</option>
+                        <option>Manager</option>
+                    </select>
 
-                    <div className="md:col-span-2">
-                        <label className="mb-2 block text-sm font-medium text-gray-700">
-                            Image URL (optional)
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full rounded-xl border px-4 py-3"
-                            value={form.imageUrl}
-                            onChange={(e) => handleChange('imageUrl', e.target.value)}
-                        />
-                    </div>
+                    <input
+                        placeholder="Image URL"
+                        value={form.imageUrl}
+                        onChange={(e) =>
+                            handleChange('imageUrl', e.target.value)
+                        }
+                    />
 
-                    <div className="mt-2 flex gap-3 md:col-span-2">
+                    <div className="md:col-span-2 flex gap-3">
                         <button
                             type="submit"
                             disabled={loading}
-                            className="rounded-xl bg-amber-600 px-6 py-3 font-medium text-white hover:bg-amber-700 disabled:opacity-60"
+                            className="bg-amber-600 text-white px-6 py-3 rounded-xl"
                         >
-                            {loading ? 'Sending Request...' : 'Send Request'}
+                            {loading ? 'Sending...' : 'Send Request'}
                         </button>
 
                         <button
                             type="button"
-                            onClick={() => navigate('/login?type=employee')}
-                            className="rounded-xl border px-6 py-3 font-medium text-gray-700 hover:bg-gray-50"
+                            onClick={() =>
+                                navigate('/login?type=employee')
+                            }
+                            className="border px-6 py-3 rounded-xl"
                         >
-                            Go to Employee Login
+                            Go to Login
                         </button>
                     </div>
                 </form>

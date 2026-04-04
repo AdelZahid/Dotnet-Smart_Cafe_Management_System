@@ -64,5 +64,25 @@ namespace CafeManagementAPI.Controllers
 
             return Ok(response);
         }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterOwnerRequestDto request)
+        {
+            var response = await _authService.RegisterOwnerAsync(request);
+            if (!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
+        [HttpPost("register-employee")]
+        public async Task<IActionResult> RegisterEmployee([FromBody] RegisterEmployeeRequestDto request)
+        {
+            var response = await _authService.RegisterEmployeeAsync(request);
+            if (!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
     }
 }

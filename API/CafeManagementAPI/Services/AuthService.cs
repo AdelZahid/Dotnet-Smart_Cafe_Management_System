@@ -16,6 +16,7 @@ namespace CafeManagementAPI.Services
         Task<AuthResponseDto> GoogleLoginAsync(GoogleLoginRequestDto request);
         Task<AuthResponseDto> RegisterOwnerAsync(RegisterOwnerRequestDto request);
         Task<AuthResponseDto> RegisterEmployeeRequestAsync(EmployeeRegisterRequestDto request);
+        Task<AuthResponseDto> RegisterEmployeeAsync(RegisterEmployeeRequestDto request);
     }
 
     public class AuthService : IAuthService
@@ -142,6 +143,50 @@ namespace CafeManagementAPI.Services
                 Success = true,
                 Message = "Employee registration request submitted successfully"
             };
+        }
+
+        public async Task<AuthResponseDto> RegisterEmployeeAsync(RegisterEmployeeRequestDto request)
+        {
+            var normalizedRole = request.Role.Trim();
+            if (normalizedRole != "Manager" && normalizedRole != "Waiter")
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Role must be either Manager or Waiter"
+                };
+            }
+
+            var cafe = await _context.CafeProfiles.FirstOrDefaultAsync(c => c.Id == request.CafeId);
+            if (cafe == null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Cafe not found"
+                };
+            }
+
+            if (string.IsNullOrWhiteSpace(cafe.Email))
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Selected cafe cannot accept employee requests yet"
+                };
+            }
+
+            var requestDto = new EmployeeRegisterRequestDto
+            {
+                Name = string.IsNullOrWhiteSpace(request.Name)
+                    ? request.Email.Split('@')[0]
+                    : request.Name.Trim(),
+                Email = request.Email,
+                CafeEmail = cafe.Email,
+                Designation = normalizedRole
+            };
+
+            return await RegisterEmployeeRequestAsync(requestDto);
         }
 
         public async Task<AuthResponseDto> GoogleLoginAsync(GoogleLoginRequestDto request)
@@ -320,3 +365,4 @@ namespace CafeManagementAPI.Services
         }
     }
 }
+

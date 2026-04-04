@@ -29,6 +29,7 @@ IF OBJECT_ID('dbo.MenuItems', 'U') IS NOT NULL DROP TABLE MenuItems;
 IF OBJECT_ID('dbo.Attendance', 'U') IS NOT NULL DROP TABLE Attendance;
 IF OBJECT_ID('dbo.SalaryPayments', 'U') IS NOT NULL DROP TABLE SalaryPayments;
 IF OBJECT_ID('dbo.Employees', 'U') IS NOT NULL DROP TABLE Employees;
+IF OBJECT_ID('dbo.EmployeeRegistrationRequests', 'U') IS NOT NULL DROP TABLE EmployeeRegistrationRequests;
 IF OBJECT_ID('dbo.CafeProfiles', 'U') IS NOT NULL DROP TABLE CafeProfiles;
 IF OBJECT_ID('dbo.Users', 'U') IS NOT NULL DROP TABLE Users;
 GO
@@ -94,6 +95,27 @@ CREATE TABLE Employees (
 GO
 
 -- =============================================
+-- EMPLOYEE REGISTRATION REQUESTS TABLE
+-- =============================================
+CREATE TABLE EmployeeRegistrationRequests (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(200) NOT NULL,
+    Age INT NULL,
+    Sex NVARCHAR(20) NULL,
+    Email NVARCHAR(255) NOT NULL,
+    CafeEmail NVARCHAR(255) NOT NULL,
+    Phone NVARCHAR(50) NULL,
+    Address NVARCHAR(500) NULL,
+    Designation NVARCHAR(100) NOT NULL CHECK (Designation IN ('Manager', 'Waiter')),
+    ImageUrl NVARCHAR(500) NULL,
+    Status NVARCHAR(20) NOT NULL DEFAULT 'Pending' CHECK (Status IN ('Pending', 'Approved', 'Rejected')),
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    ApprovedAt DATETIME2 NULL,
+    RejectedAt DATETIME2 NULL
+);
+GO
+
+-- =============================================
 -- ATTENDANCE TABLE
 -- =============================================
 CREATE TABLE Attendance (
@@ -150,8 +172,8 @@ CREATE TABLE MenuItems (
     Description NVARCHAR(1000) NULL,
     UnitPrice DECIMAL(18,2) NOT NULL,
     ImageUrl NVARCHAR(500) NULL,
-    PriceRange NVARCHAR(20) GENERATED ALWAYS AS (
-        CASE 
+    PriceRange AS (
+        CASE
             WHEN UnitPrice < 100 THEN 'Low'
             WHEN UnitPrice >= 100 AND UnitPrice < 300 THEN 'Medium'
             ELSE 'High'
@@ -326,18 +348,28 @@ CREATE INDEX IX_IngredientUsage_Date ON IngredientUsage(UsageDate);
 CREATE INDEX IX_IngredientPurchases_Date ON IngredientPurchases(PurchaseDate);
 CREATE INDEX IX_AdditionalCosts_Date ON AdditionalCosts(CostDate);
 CREATE INDEX IX_Reservations_Date ON Reservations(ReservationDate);
+CREATE INDEX IX_EmployeeRegistrationRequests_Email ON EmployeeRegistrationRequests(Email);
+CREATE INDEX IX_EmployeeRegistrationRequests_CafeEmail ON EmployeeRegistrationRequests(CafeEmail);
+CREATE UNIQUE INDEX IX_EmployeeRegistrationRequests_Email_CafeEmail_Pending
+    ON EmployeeRegistrationRequests(Email, CafeEmail)
+    WHERE Status = 'Pending';
 GO
 
 -- =============================================
 -- SEED DATA
 -- =============================================
 
--- Insert default categories
-INSERT INTO ItemCategories (CafeId, Name, Description) VALUES 
-(1, 'Beverages', 'Coffee, Tea, and other drinks'),
-(1, 'Snacks', 'Light snacks and appetizers'),
-(1, 'Main Course', 'Full meals and main dishes'),
-(1, 'Desserts', 'Sweet treats and desserts');
+DECLARE @SeedCafeId INT;
+SELECT TOP 1 @SeedCafeId = Id FROM CafeProfiles ORDER BY Id;
+
+IF @SeedCafeId IS NOT NULL
+BEGIN
+    INSERT INTO ItemCategories (CafeId, Name, Description) VALUES
+    (@SeedCafeId, 'Beverages', 'Coffee, Tea, and other drinks'),
+    (@SeedCafeId, 'Snacks', 'Light snacks and appetizers'),
+    (@SeedCafeId, 'Main Course', 'Full meals and main dishes'),
+    (@SeedCafeId, 'Desserts', 'Sweet treats and desserts');
+END
 GO
 
 PRINT 'Database Schema Created Successfully!';

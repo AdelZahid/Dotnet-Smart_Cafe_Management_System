@@ -474,7 +474,7 @@ namespace CafeManagementAPI.Services
         public async Task<List<ReservationResponseDto>> GetReservationsAsync(int cafeId, DateTime? date)
         {
             var query = _context.Reservations
-                .Where(r => r.CafeId == cafeId)
+                .Where(r => r.CafeId == cafeId && r.Status == "Confirmed")
                 .AsQueryable();
 
             if (date.HasValue)
@@ -521,7 +521,7 @@ namespace CafeManagementAPI.Services
 
             var tables = await _context.Tables
                 .Where(t => t.CafeId == cafeId)
-                .Include(t => t.Reservations.Where(r => r.ReservationDate.Date == targetDate))
+                .Include(t => t.Reservations.Where(r => r.ReservationDate.Date == targetDate && r.Status == "Confirmed"))
                 .OrderBy(t => t.TableNumber)
                 .ToListAsync();
 
@@ -544,7 +544,7 @@ namespace CafeManagementAPI.Services
 
                 var status = !t.IsActive
                     ? "Inactive"
-                    : reservations.Any(r => r.Status == "Confirmed")
+                    : reservations.Any()
                         ? "Reserved"
                         : "Available";
 

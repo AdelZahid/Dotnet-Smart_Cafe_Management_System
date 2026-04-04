@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { authApi } from '@/services/api'
+import { Coffee } from 'lucide-react'
 
 const Login = () => {
     const location = useLocation()
@@ -67,9 +68,15 @@ const Login = () => {
     }
 
     return (
-        <div className="min-h-screen bg-amber-50 flex items-center justify-center px-4">
+        <div className="min-h-screen bg-amber-50 flex flex-col items-center justify-center px-4">
+            <Link to="/" className="flex items-center space-x-2 mb-8">
+                <div className="bg-amber-100 p-3 rounded-xl shadow-sm">
+                    <Coffee className="h-8 w-8 text-amber-600" />
+                </div>
+                <span className="font-bold text-3xl tracking-tight text-gray-900">Cafems</span>
+            </Link>
             <div className="w-full max-w-md rounded-2xl bg-white border shadow-lg p-6">
-                <h1 className="text-2xl font-bold text-gray-900 text-center">Cafe Login</h1>
+                <h1 className="text-2xl font-bold text-gray-900 text-center">Login to your account</h1>
 
                 <div className="grid grid-cols-2 gap-2 mt-6">
                     <button

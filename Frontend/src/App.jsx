@@ -11,6 +11,11 @@ import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import Staff from './pages/Staff'
 import Tables from './pages/Tables'
+import Landing from './pages/Landing'
+import FeaturesPage from './pages/FeaturesPage'
+import PricingPage from './pages/PricingPage'
+import AboutPage from './pages/AboutPage'
+import ContactPage from './pages/ContactPage'
 
 import ManagerLayout from './pages/manager/ManagerLayout'
 import ManagerItems from './pages/manager/ManagerItems'
@@ -46,7 +51,11 @@ const ProtectedRoute = ({ children }) => {
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/features" element={<FeaturesPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/auth" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/owner/register" element={<Register />} />

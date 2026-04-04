@@ -51,8 +51,10 @@ const Layout = () => {
       {/* Sidebar */}
       <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200">
         <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-200">
-          <Coffee className="h-8 w-8 text-amber-600" />
-          <span className="text-xl font-bold text-gray-900">CafeManager</span>
+          <div className="bg-amber-100 p-2 rounded-lg shadow-sm">
+            <Coffee className="h-6 w-6 text-amber-600" />
+          </div>
+          <span className="text-xl font-bold text-gray-900 tracking-tight">Cafems</span>
         </div>
 
         <nav className="flex-1 px-4 py-4 space-y-1">

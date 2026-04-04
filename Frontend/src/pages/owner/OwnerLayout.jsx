@@ -25,12 +25,12 @@ const OwnerLayout = () => {
       <aside className="w-72 bg-white border-r shadow-sm hidden md:flex md:flex-col">
         <div className="px-6 py-6 border-b">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-amber-100 flex items-center justify-center">
+            <div className="h-12 w-12 rounded-2xl bg-amber-100 flex items-center justify-center shadow-sm">
               <Coffee className="h-6 w-6 text-amber-700" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">Cafe Owner Panel</h1>
-              <p className="text-sm text-gray-500">{user?.cafeName || 'Your Cafe'}</p>
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900">Cafems</h1>
+              <p className="text-sm font-medium text-amber-600">{user?.cafeName || 'Owner Panel'}</p>
             </div>
           </div>
         </div>

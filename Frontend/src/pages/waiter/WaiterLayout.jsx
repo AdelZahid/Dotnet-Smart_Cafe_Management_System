@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BookOpen, ClipboardList, CreditCard, LogOut, Table2 } from 'lucide-react'
+import { BookOpen, ClipboardList, CreditCard, LogOut, Table2, Coffee } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 
 const items = [
@@ -11,7 +11,7 @@ const items = [
 
 const WaiterLayout = () => {
     const navigate = useNavigate()
-    const { user, logout } = useAuthStore()
+    const { logout } = useAuthStore()
 
     const handleLogout = () => {
         logout()
@@ -21,9 +21,16 @@ const WaiterLayout = () => {
     return (
         <div className="min-h-screen bg-gray-50 flex">
             <aside className="w-72 bg-white border-r shadow-sm hidden md:flex md:flex-col">
-                <div className="p-6 border-b">
-                    <h1 className="text-xl font-bold text-gray-900">Waiter Panel</h1>
-                    <p className="text-sm text-gray-500">{user?.email}</p>
+                <div className="px-6 py-6 border-b">
+                    <div className="flex items-center gap-3">
+                        <div className="h-12 w-12 rounded-2xl bg-amber-100 flex items-center justify-center shadow-sm">
+                            <Coffee className="h-6 w-6 text-amber-700" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold tracking-tight text-gray-900">Cafems</h1>
+                            <p className="text-sm font-medium text-amber-600">Waiter Panel ({user?.email})</p>
+                        </div>
+                    </div>
                 </div>
 
                 <nav className="flex-1 p-4 space-y-2">

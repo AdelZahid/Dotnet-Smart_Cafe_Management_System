@@ -1,36 +1,21 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import {
-    Package,
-    ClipboardList,
-    ShoppingBag,
-    RotateCcw,
-    Wheat,
-    Receipt,
-    CalendarDays,
-    Wallet,
-    LogOut,
-    Coffee,
-} from 'lucide-react'
+import { BookOpen, ClipboardList, CreditCard, LogOut, Table2, Coffee } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 
 const items = [
-    { to: '/manager/items', label: 'Items', icon: Package },
-    { to: '/manager/orders', label: 'Orders', icon: ClipboardList },
-    { to: '/manager/purchased', label: 'Purchased', icon: ShoppingBag },
-    { to: '/manager/refund-cancel', label: 'Refund / Cancel', icon: RotateCcw },
-    { to: '/manager/ingredients', label: 'Ingredients', icon: Wheat },
-    { to: '/manager/additional-costs', label: 'Additional Cost', icon: Receipt },
-    { to: '/manager/reservations', label: 'Reservation', icon: CalendarDays },
-    { to: '/manager/salary', label: 'Salary', icon: Wallet },
+    { to: '/waiter/menu', label: 'Menu', icon: BookOpen },
+    { to: '/waiter/tables', label: 'Tables', icon: Table2 },
+    { to: '/waiter/orders', label: 'Orders', icon: ClipboardList },
+    { to: '/waiter/payment', label: 'Payment', icon: CreditCard },
 ]
 
-const ManagerLayout = () => {
+const WaiterLayout = () => {
     const navigate = useNavigate()
     const { user, logout } = useAuthStore()
 
     const handleLogout = () => {
         logout()
-        navigate('/login?type=employee')
+        navigate('/login')
     }
 
     return (
@@ -43,7 +28,7 @@ const ManagerLayout = () => {
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight text-gray-900">Cafems</h1>
-                            <p className="text-sm font-medium text-amber-600">Manager Panel</p>
+                            <p className="text-sm font-medium text-amber-600">Waiter Panel</p>
                         </div>
                     </div>
                 </div>
@@ -89,4 +74,5 @@ const ManagerLayout = () => {
     )
 }
 
-export default ManagerLayout
+export default WaiterLayout
+

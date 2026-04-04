@@ -4,18 +4,22 @@ import { Coffee, Users } from 'lucide-react'
 const teamMembers = [
     {
         name: 'Adel Zahid',
+        id: 20220204057,
         email: 'adel.cse.20220204057@aust.edu',
     },
     {
         name: 'Md. Rubayet Islam',
+        id: 20220204069,
         email: 'rubayet.cse.20220204069@aust.edu',
     },
     {
         name: 'Ma-Huan Sheikh Meem',
+        id: 20220204070,
         email: 'ma-huan.cse.20220204070@aust.edu',
     },
     {
         name: 'Md Ahsan Habib Ridoy',
+        id: 20220204064,
         email: 'ahsan.cse.20220204064@aust.edu',
     },
 ]

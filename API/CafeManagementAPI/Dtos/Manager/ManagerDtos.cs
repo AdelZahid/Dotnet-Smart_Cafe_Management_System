@@ -186,6 +186,28 @@ namespace CafeManagementAPI.Dtos.Manager
         public int NumberOfGuests { get; set; }
     }
 
+    public class TableReservationInfoDto
+    {
+        public int ReservationId { get; set; }
+        public string CustomerName { get; set; } = string.Empty;
+        public string CustomerPhone { get; set; } = string.Empty;
+        public DateTime ReservationDate { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public int NumberOfGuests { get; set; }
+        public string Status { get; set; } = string.Empty;
+    }
+
+    public class TableOverviewDto
+    {
+        public int TableId { get; set; }
+        public string TableNumber { get; set; } = string.Empty;
+        public int Capacity { get; set; }
+        public bool IsActive { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public List<TableReservationInfoDto> Reservations { get; set; } = new();
+    }
+
     // Salary DTOs
     public class SalaryPaymentCreateDto
     {

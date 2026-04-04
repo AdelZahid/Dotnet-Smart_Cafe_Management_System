@@ -85,6 +85,27 @@ namespace CafeManagementAPI.Dtos.Waiter
         public List<OrderItemSummaryDto> Items { get; set; } = new();
     }
 
+    public class WaiterTableReservationInfoDto
+    {
+        public int ReservationId { get; set; }
+        public string CustomerName { get; set; } = string.Empty;
+        public DateTime ReservationDate { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public int NumberOfGuests { get; set; }
+        public string Status { get; set; } = string.Empty;
+    }
+
+    public class WaiterTableOverviewDto
+    {
+        public int TableId { get; set; }
+        public string TableNumber { get; set; } = string.Empty;
+        public int Capacity { get; set; }
+        public bool IsActive { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public List<WaiterTableReservationInfoDto> Reservations { get; set; } = new();
+    }
+
     // Notification DTO
     public class OrderReadyNotificationDto
     {

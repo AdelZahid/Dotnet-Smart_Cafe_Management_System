@@ -34,6 +34,7 @@ import OwnerManagerSalary from './pages/owner/OwnerManagerSalary'
 
 import WaiterLayout from './pages/waiter/WaiterLayout'
 import WaiterMenu from './pages/waiter/WaiterMenu'
+import WaiterTables from './pages/waiter/WaiterTables'
 import WaiterOrders from './pages/waiter/WaiterOrders'
 import WaiterPayment from './pages/waiter/WaiterPayment'
 
@@ -162,6 +163,7 @@ function App() {
             >
                 <Route index element={<Navigate to="menu" replace />} />
                 <Route path="menu" element={<WaiterMenu />} />
+                <Route path="tables" element={<WaiterTables />} />
                 <Route path="orders" element={<WaiterOrders />} />
                 <Route path="payment" element={<WaiterPayment />} />
             </Route>

@@ -38,6 +38,7 @@ namespace CafeManagementAPI.Services
         Task<ReservationResponseDto> CreateReservationAsync(int cafeId, ReservationCreateDto request);
         Task<List<ReservationResponseDto>> GetReservationsAsync(int cafeId, DateTime? date);
         Task<List<TodaysReservationDto>> GetTodaysReservationsAsync(int cafeId);
+        Task<List<TableOverviewDto>> GetTableOverviewAsync(int cafeId, DateTime? date);
         Task<bool> CancelReservationAsync(int cafeId, int reservationId);
 
         // Salary
@@ -391,8 +392,6 @@ namespace CafeManagementAPI.Services
         }
         #endregion
 
-
-
         #region Additional Costs
         public async Task<List<AdditionalCostResponseDto>> GetAdditionalCostsAsync(int cafeId, DateTime? startDate, DateTime? endDate)
         {
@@ -513,6 +512,51 @@ namespace CafeManagementAPI.Services
                 CustomerName = r.CustomerName,
                 CustomerPhone = r.CustomerPhone,
                 NumberOfGuests = r.NumberOfGuests
+            }).ToList();
+        }
+
+        public async Task<List<TableOverviewDto>> GetTableOverviewAsync(int cafeId, DateTime? date)
+        {
+            var targetDate = (date ?? DateTime.UtcNow).Date;
+
+            var tables = await _context.Tables
+                .Where(t => t.CafeId == cafeId)
+                .Include(t => t.Reservations.Where(r => r.ReservationDate.Date == targetDate))
+                .OrderBy(t => t.TableNumber)
+                .ToListAsync();
+
+            return tables.Select(t =>
+            {
+                var reservations = t.Reservations
+                    .OrderBy(r => r.StartTime)
+                    .Select(r => new TableReservationInfoDto
+                    {
+                        ReservationId = r.Id,
+                        CustomerName = r.CustomerName,
+                        CustomerPhone = r.CustomerPhone,
+                        ReservationDate = r.ReservationDate,
+                        StartTime = r.StartTime,
+                        EndTime = r.EndTime,
+                        NumberOfGuests = r.NumberOfGuests,
+                        Status = r.Status
+                    })
+                    .ToList();
+
+                var status = !t.IsActive
+                    ? "Inactive"
+                    : reservations.Any(r => r.Status == "Confirmed")
+                        ? "Reserved"
+                        : "Available";
+
+                return new TableOverviewDto
+                {
+                    TableId = t.Id,
+                    TableNumber = t.TableNumber,
+                    Capacity = t.Capacity,
+                    IsActive = t.IsActive,
+                    Status = status,
+                    Reservations = reservations
+                };
             }).ToList();
         }
 

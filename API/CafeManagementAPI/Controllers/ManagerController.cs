@@ -274,6 +274,21 @@ namespace CafeManagementAPI.Controllers
             }
         }
 
+        [HttpGet("tables-overview")]
+        public async Task<IActionResult> GetTablesOverview([FromQuery] DateTime? date)
+        {
+            try
+            {
+                var cafeId = GetCafeId();
+                var tables = await _managerService.GetTableOverviewAsync(cafeId, date);
+                return Ok(tables);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("reservations/today")]
         public async Task<IActionResult> GetTodaysReservations()
         {

@@ -171,6 +171,7 @@ export const managerApi = {
 
     getReservations: (date) => api.get(`/manager/reservations${date ? `?date=${date}` : ''}`),
     getTodayReservations: () => api.get('/manager/reservations/today'),
+    getTablesOverview: (date) => api.get(`/manager/tables-overview${date ? `?date=${date}` : ''}`),
     createReservation: (data) => api.post('/manager/reservations', data),
     cancelReservation: (id) => api.put(`/manager/reservations/${id}/cancel`),
 
@@ -181,6 +182,7 @@ export const managerApi = {
 
 export const waiterApi = {
     getMenu: () => api.get('/waiter/menu'),
+    getTables: (date) => api.get(`/waiter/tables${date ? `?date=${date}` : ''}`),
     getMyOrders: () => api.get('/waiter/orders'),
     createOrder: (data) => api.post('/waiter/orders', data),
     updateOrderStatus: (id, status) => api.put(`/waiter/orders/${id}/status`, { status }),

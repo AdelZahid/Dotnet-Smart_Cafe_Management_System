@@ -9,6 +9,7 @@ namespace CafeManagementAPI.Services
     {
         // Menu
         Task<List<MenuItemForWaiterDto>> GetAvailableMenuItemsAsync(int cafeId);
+        Task<List<WaiterTableOverviewDto>> GetTableOverviewAsync(int cafeId, DateTime? date);
 
         // Orders
         Task<WaiterOrderListDto> CreateOrderAsync(int cafeId, int waiterId, CreateOrderDto request);
@@ -48,6 +49,51 @@ namespace CafeManagementAPI.Services
                 UnitPrice = mi.UnitPrice,
                 ImageUrl = mi.ImageUrl,
                 CategoryName = mi.Category?.Name
+            }).ToList();
+        }
+
+        public async Task<List<WaiterTableOverviewDto>> GetTableOverviewAsync(int cafeId, DateTime? date)
+        {
+            var targetDate = (date ?? DateTime.UtcNow).Date;
+
+            var tables = await _context.Tables
+                .Where(t => t.CafeId == cafeId)
+                .Include(t => t.Reservations.Where(r => r.ReservationDate.Date == targetDate))
+                .OrderBy(t => t.TableNumber)
+                .ToListAsync();
+
+            return tables.Select(t =>
+            {
+                var reservations = t.Reservations
+                    .Where(r => r.Status == "Confirmed")
+                    .OrderBy(r => r.StartTime)
+                    .Select(r => new WaiterTableReservationInfoDto
+                    {
+                        ReservationId = r.Id,
+                        CustomerName = r.CustomerName,
+                        ReservationDate = r.ReservationDate,
+                        StartTime = r.StartTime,
+                        EndTime = r.EndTime,
+                        NumberOfGuests = r.NumberOfGuests,
+                        Status = r.Status
+                    })
+                    .ToList();
+
+                var status = !t.IsActive
+                    ? "Inactive"
+                    : reservations.Any()
+                        ? "Reserved"
+                        : "Available";
+
+                return new WaiterTableOverviewDto
+                {
+                    TableId = t.Id,
+                    TableNumber = t.TableNumber,
+                    Capacity = t.Capacity,
+                    IsActive = t.IsActive,
+                    Status = status,
+                    Reservations = reservations
+                };
             }).ToList();
         }
         #endregion

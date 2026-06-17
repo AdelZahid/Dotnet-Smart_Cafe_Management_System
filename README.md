@@ -1,7 +1,7 @@
 # Cafe Management System
 
 A full-stack Cafe Management System built using **ASP.NET Core Web API** and **React (Vite + TailwindCSS)**.  
-The system manages cafe operations including **orders, payments, staff management, inventory, and reports** with different roles such as **Owner, Manager, and Waiter**.
+The system manages regular cafe operations including **orders, payments, staff management, inventory, and reports** with different roles such as **Owner, Manager, and Waiter**. And also manage the accounts 
 
 ---
 
